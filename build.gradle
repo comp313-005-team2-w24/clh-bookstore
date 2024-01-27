@@ -6,6 +6,13 @@ plugins {
 
 group = 'io.clh'
 version = '1.0-SNAPSHOT'
+sourceCompatibility = '17'
+
+jib {
+    to {
+        image = 'glad2os/clh-bookstore'
+    }
+}
 
 repositories {
     mavenCentral()
