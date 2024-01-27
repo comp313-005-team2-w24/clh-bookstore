@@ -7,6 +7,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 
 import java.util.Properties;
+import io.clh.models.Author;
 
 public class HibernateConfigUtil {
     public static SessionFactory createSessionFactory() {
@@ -27,7 +28,7 @@ public class HibernateConfigUtil {
         configuration.setProperties(settings);
 
         // Add annotated classes
-        configuration.addAnnotatedClass(io.clh.models.Author.class);
+        configuration.addAnnotatedClass(Author.class);
 
         return configuration.buildSessionFactory();
     }

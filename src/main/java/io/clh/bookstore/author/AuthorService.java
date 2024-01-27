@@ -6,9 +6,10 @@ import org.hibernate.Transaction;
 
 import java.util.List;
 
+import io.clh.models.Author;
+
 public class AuthorService implements IAuthor{
 
-    // TODO: remove all try catch to level up.
     private final SessionFactory sessionFactory;
 
     public AuthorService(SessionFactory sessionFactory) {
@@ -16,30 +17,28 @@ public class AuthorService implements IAuthor{
     }
 
     @Override
-    public void addAuthor(io.clh.models.Author author) {
-        try (Session session = sessionFactory.openSession()) {
-            Transaction transaction = session.beginTransaction();
-            try {
-                session.save(author);
-                transaction.commit();
-            } catch (Exception e) {
-                transaction.rollback();
-                throw e;
-            }
-        }
+    public Author addAuthor(Author author) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(author);
+        transaction.commit();
+        session.close();
+        return author;
     }
 
     @Override
-    public io.clh.models.Author getAuthorById(int id) {
-        try (Session session = sessionFactory.openSession()) {
-            return session.get(io.clh.models.Author.class, id);
-        }
+    public Author getAuthorById(int id) {
+        Session session = sessionFactory.openSession();
+        Author author = session.get(Author.class, id);
+        session.close();
+        return author;
     }
 
     @Override
-    public List<io.clh.models.Author> getAllAuthors() {
-        try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("from Author", io.clh.models.Author.class).list();
-        }
+    public List<Author> getAllAuthors() {
+        Session session = sessionFactory.openSession();
+        List<Author> authors = session.createQuery("from Author", Author.class).list();
+        session.close();
+        return authors;
     }
 }

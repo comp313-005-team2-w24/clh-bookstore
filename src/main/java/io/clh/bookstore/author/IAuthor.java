@@ -1,9 +1,10 @@
 package io.clh.bookstore.author;
 
 import java.util.List;
+import io.clh.models.Author;
 
 public interface IAuthor {
-    public void addAuthor(io.clh.models.Author author);
-    public io.clh.models.Author getAuthorById(int id);
-    List<io.clh.models.Author> getAllAuthors();
+    public Author addAuthor(Author author);
+    public Author getAuthorById(int id);
+    List<Author> getAllAuthors();
 }

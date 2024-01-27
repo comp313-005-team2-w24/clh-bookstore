@@ -14,6 +14,8 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.List;
 
+import io.clh.models.Author;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,7 +38,7 @@ public class AuthorServiceTest {
         configuration.setProperty("hibernate.connection.url", postgresqlContainer.getJdbcUrl());
         configuration.setProperty("hibernate.connection.username", postgresqlContainer.getUsername());
         configuration.setProperty("hibernate.connection.password", postgresqlContainer.getPassword());
-        configuration.addAnnotatedClass(io.clh.models.Author.class);
+        configuration.addAnnotatedClass(Author.class);
 
         sessionFactory = configuration.buildSessionFactory();
         session = sessionFactory.openSession();
@@ -73,11 +75,11 @@ public class AuthorServiceTest {
     @Order(1)
     public void createAuthor() {
         AuthorService authorService = new AuthorService(sessionFactory);
-        io.clh.models.Author author = new io.clh.models.Author(1, "username".toCharArray(), "my biblio");
+        Author author = new Author(1, "username".toCharArray(), "my biblio");
 
         session.beginTransaction();
         authorService.addAuthor(author);
-        io.clh.models.Author retrievedAuthor = authorService.getAuthorById(1);
+        Author retrievedAuthor = authorService.getAuthorById(1);
         session.getTransaction().commit();
 
         Assertions.assertNotNull(retrievedAuthor);
@@ -89,7 +91,7 @@ public class AuthorServiceTest {
     @Order(2)
     public void getAllAuthorsShouldNotBeEmpty() {
         AuthorService authorService = new AuthorService(sessionFactory);
-        List<io.clh.models.Author> authors = authorService.getAllAuthors();
+        List<Author> authors = authorService.getAllAuthors();
 
         assertFalse(authors.isEmpty(), "The list of authors should not be empty");
     }
