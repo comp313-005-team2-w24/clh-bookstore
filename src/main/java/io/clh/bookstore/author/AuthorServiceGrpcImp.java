@@ -75,7 +75,7 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             AuthorEntity response = AuthorEntity
                     .newBuilder()
                     .setAuthorId(authorById.getAuthor_id())
-                    .setName(Arrays.toString(authorById.getName()))
+                    .setName(new String(authorById.getName()))
                     .setBiography(authorById.getBiography())
                     .build();
 
