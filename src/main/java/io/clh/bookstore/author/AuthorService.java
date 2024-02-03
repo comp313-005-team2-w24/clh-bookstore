@@ -27,7 +27,7 @@ public class AuthorService implements IAuthor{
     }
 
     @Override
-    public Author getAuthorById(int id) {
+    public Author getAuthorById(Integer id) {
         Session session = sessionFactory.openSession();
         Author author = session.get(Author.class, id);
         session.close();
