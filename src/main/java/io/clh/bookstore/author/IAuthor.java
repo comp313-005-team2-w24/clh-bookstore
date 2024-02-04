@@ -1,10 +1,15 @@
 package io.clh.bookstore.author;
 
-import java.util.List;
 import io.clh.models.Author;
 
+import java.util.List;
+
 public interface IAuthor {
-    public Author addAuthor(Author author);
-    public Author getAuthorById(Integer id);
+    Author addAuthor(Author author);
+
+    Author getAuthorById(Integer id);
+
     List<Author> getAllAuthors();
+
+    Author setUrlAvatar(String url, Integer id) throws IllegalAccessException;
 }

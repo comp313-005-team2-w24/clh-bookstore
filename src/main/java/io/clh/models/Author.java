@@ -19,4 +19,5 @@ public class Author {
 
     private char[] name;
     private String biography;
+    private String avatar_url;
 }

@@ -1,14 +1,13 @@
 package io.clh.bookstore.author;
 
+import io.clh.models.Author;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
-import io.clh.models.Author;
-
-public class AuthorService implements IAuthor{
+public class AuthorService implements IAuthor {
 
     private final SessionFactory sessionFactory;
 
@@ -18,12 +17,17 @@ public class AuthorService implements IAuthor{
 
     @Override
     public Author addAuthor(Author author) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = session.beginTransaction();
-        session.save(author);
-        transaction.commit();
-        session.close();
-        return author;
+        Transaction transaction = null;
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.save(author);
+            transaction.commit();
+
+            return author;
+        } catch (RuntimeException e) {
+            if (transaction != null) transaction.rollback();
+            throw e;
+        }
     }
 
     @Override
@@ -41,4 +45,29 @@ public class AuthorService implements IAuthor{
         session.close();
         return authors;
     }
+
+    @Override
+    public Author setUrlAvatar(String url, Integer id) throws IllegalAccessException {
+        Transaction transaction = null;
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+
+            Author author = session.get(Author.class, id);
+            if (author == null) {
+                throw new IllegalAccessException(String.format("User with id %s not found", id));
+            }
+
+            author.setAvatar_url(url);
+            session.update(author);
+            transaction.commit();
+
+            return author;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
+        }
+    }
+
 }
