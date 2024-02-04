@@ -14,7 +14,7 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
     }
 
     @Override
-    public void createAuthor(CreateAuthorRequest request, StreamObserver<CreateAuthorResponse> responseObserver) {
+    public void createAuthor(CreateAuthorRequest request, StreamObserver<AuthorEntity> responseObserver) {
         /*
          * Pay attention to package name
          * io.clh.models.Author is entity, while
@@ -28,7 +28,7 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
 
             Author createdAuthor = authorService.addAuthor(author);
 
-            CreateAuthorResponse response = CreateAuthorResponse.newBuilder().setAuthorId(createdAuthor.getAuthor_id()).setName(Arrays.toString(createdAuthor.getName())).setBiography(createdAuthor.getBiography()).build();
+            AuthorEntity response = AuthorEntity.newBuilder().setAuthorId(createdAuthor.getAuthor_id()).setName(Arrays.toString(createdAuthor.getName())).setBiography(createdAuthor.getBiography()).build();
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -38,12 +38,12 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
     }
 
     @Override
-    public void getAllAuthors(GetAllAuthorsRequest request, StreamObserver<GetAllAuthorsResponse> responseObserver) {
+    public void getAllAuthors(GetAllAuthorsRequest request, StreamObserver<AuthorEntity> responseObserver) {
         try {
             List<Author> authors = authorService.getAllAuthors();
 
             for (Author author : authors) {
-                GetAllAuthorsResponse response = GetAllAuthorsResponse.newBuilder().setAuthorId(author.getAuthor_id()).setName(new String(author.getName())).setBiography(author.getBiography()).build();
+                AuthorEntity response = AuthorEntity.newBuilder().setAuthorId(author.getAuthor_id()).setName(new String(author.getName())).setBiography(author.getBiography()).build();
 
                 responseObserver.onNext(response);
             }
