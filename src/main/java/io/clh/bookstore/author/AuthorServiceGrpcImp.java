@@ -28,12 +28,7 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
 
             Author createdAuthor = authorService.addAuthor(author);
 
-            CreateAuthorResponse response = CreateAuthorResponse
-                    .newBuilder()
-                    .setAuthorId(createdAuthor.getAuthor_id())
-                    .setName(Arrays.toString(createdAuthor.getName()))
-                    .setBiography(createdAuthor.getBiography())
-                    .build();
+            CreateAuthorResponse response = CreateAuthorResponse.newBuilder().setAuthorId(createdAuthor.getAuthor_id()).setName(Arrays.toString(createdAuthor.getName())).setBiography(createdAuthor.getBiography()).build();
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -48,11 +43,7 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             List<Author> authors = authorService.getAllAuthors();
 
             for (Author author : authors) {
-                GetAllAuthorsResponse response = GetAllAuthorsResponse.newBuilder()
-                        .setAuthorId(author.getAuthor_id())
-                        .setName(new String(author.getName()))
-                        .setBiography(author.getBiography())
-                        .build();
+                GetAllAuthorsResponse response = GetAllAuthorsResponse.newBuilder().setAuthorId(author.getAuthor_id()).setName(new String(author.getName())).setBiography(author.getBiography()).build();
 
                 responseObserver.onNext(response);
             }
@@ -62,21 +53,34 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
         }
     }
 
-    /**
-     * @param request
-     * @param responseObserver
-     */
     @Override
     public void getAuthorById(AuthorByIdRequest request, StreamObserver<AuthorEntity> responseObserver) {
         try {
             long authorId = request.getAuthorId();
             Author authorById = authorService.getAuthorById((int) authorId);
 
-            AuthorEntity response = AuthorEntity
-                    .newBuilder()
-                    .setAuthorId(authorById.getAuthor_id())
-                    .setName(new String(authorById.getName()))
-                    .setBiography(authorById.getBiography())
+            AuthorEntity response = AuthorEntity.newBuilder().setAuthorId(authorById.getAuthor_id()).setName(new String(authorById.getName())).setBiography(authorById.getBiography()).build();
+
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(e);
+        }
+    }
+
+    @Override
+    public void setAuthorAvatarUrlById(AuthorAvatarUrlRequest request, StreamObserver<AuthorEntity> responseObserver) {
+        long authorId = request.getAuthorId();
+        String avatarUrl = request.getAvatarUrl();
+
+        try {
+            Author author = authorService.setUrlAvatar(avatarUrl, (int) authorId);
+
+            AuthorEntity response = AuthorEntity.newBuilder()
+                    .setAuthorId(author.getAuthor_id())
+                    .setName(new String(author.getName()))
+                    .setBiography(author.getBiography())
+                    .setAvatarUrl(author.getAvatar_url())
                     .build();
 
             responseObserver.onNext(response);
