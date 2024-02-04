@@ -47,7 +47,7 @@ public class AuthorService implements IAuthor {
     }
 
     @Override
-    public Author setUrlAvatar(String url, Integer id) throws IllegalAccessException {
+    public Author setUrlAvatar(String url, Integer id) {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
