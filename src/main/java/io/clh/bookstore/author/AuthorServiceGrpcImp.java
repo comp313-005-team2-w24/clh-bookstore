@@ -28,7 +28,12 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             author.setAvatar_url(request.getAvatarUrl());
 
             Author createdAuthor = authorService.addAuthor(author);
-            AuthorEntity response = AuthorEntity.newBuilder().setAuthorId(createdAuthor.getAuthor_id()).setName(Arrays.toString(createdAuthor.getName())).setBiography(createdAuthor.getBiography()).build();
+            AuthorEntity response = AuthorEntity.newBuilder()
+                    .setAuthorId(createdAuthor.getAuthor_id())
+                    .setName(Arrays.toString(createdAuthor.getName()))
+                    .setBiography(createdAuthor.getBiography())
+                    .setAvatarUrl(createdAuthor.getAvatar_url())
+                    .build();
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -43,7 +48,12 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             List<Author> authors = authorService.getAllAuthors();
 
             for (Author author : authors) {
-                AuthorEntity response = AuthorEntity.newBuilder().setAuthorId(author.getAuthor_id()).setName(new String(author.getName())).setBiography(author.getBiography()).build();
+                AuthorEntity response = AuthorEntity.newBuilder()
+                        .setAuthorId(author.getAuthor_id())
+                        .setName(new String(author.getName()))
+                        .setBiography(author.getBiography())
+                        .setAvatarUrl(author.getAvatar_url())
+                        .build();
 
                 responseObserver.onNext(response);
             }
@@ -59,7 +69,12 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             long authorId = request.getAuthorId();
             Author authorById = authorService.getAuthorById((int) authorId);
 
-            AuthorEntity response = AuthorEntity.newBuilder().setAuthorId(authorById.getAuthor_id()).setName(new String(authorById.getName())).setBiography(authorById.getBiography()).build();
+            AuthorEntity response = AuthorEntity.newBuilder()
+                    .setAuthorId(authorById.getAuthor_id())
+                    .setName(new String(authorById.getName()))
+                    .setBiography(authorById.getBiography())
+                    .setAvatarUrl(authorById.getAvatar_url())
+                    .build();
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
