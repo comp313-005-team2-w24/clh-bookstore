@@ -54,7 +54,7 @@ public class AuthorService implements IAuthor {
 
             Author author = session.get(Author.class, id);
             if (author == null) {
-                throw new IllegalAccessException(String.format("User with id %s not found", id));
+                throw new IllegalArgumentException(String.format("User with id %s not found", id));
             }
 
             author.setAvatar_url(url);

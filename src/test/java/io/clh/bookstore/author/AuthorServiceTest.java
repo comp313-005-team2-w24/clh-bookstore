@@ -45,7 +45,7 @@ public class AuthorServiceTest {
                 postgresqlContainer.getUsername(),
                 postgresqlContainer.getPassword()
         ); Statement stmt = conn.createStatement()) {
-            stmt.execute("CREATE TABLE authors (" + "    author_id SERIAL PRIMARY KEY," + "    name VARCHAR(100)," + "    avatar_url VARCHAR(100)," + "    biography TEXT" + ");");
+            stmt.execute("CREATE TABLE authors (" + "    author_id SERIAL PRIMARY KEY," + "    name VARCHAR(100)," + "    avatar_url VARCHAR(255)," + "    biography TEXT" + ");");
             //    stmt.execute("CREATE TABLE categories (" + "    category_id SERIAL PRIMARY KEY," + "    name VARCHAR(100)," + "    description TEXT" + ");");
             //    stmt.execute("CREATE TABLE books (" + "    book_id SERIAL PRIMARY KEY," + "    title VARCHAR(255)," + "    description TEXT," + "    isbn VARCHAR(20)," + "    publication_date DATE," + "    price DECIMAL(10, 2)," + "    stock_quantity INT," + "    author_id INT REFERENCES authors(author_id)," + "    category_id INT REFERENCES categories(category_id)" + ");");
             //    stmt.execute("CREATE TABLE orders (" + "    order_id SERIAL PRIMARY KEY," + "    book_id INT REFERENCES books(book_id)," + "    quantity INT," + "    order_date DATE," + "    total_price DECIMAL(10, 2)," + "    delivery_status VARCHAR(50)" + ");");
