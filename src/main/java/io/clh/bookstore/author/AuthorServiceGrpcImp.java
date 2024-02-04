@@ -25,9 +25,9 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             io.clh.models.Author author = new Author();
             author.setName(request.getName().toCharArray());
             author.setBiography(request.getBiography());
+            author.setAvatar_url(request.getAvatarUrl());
 
             Author createdAuthor = authorService.addAuthor(author);
-
             AuthorEntity response = AuthorEntity.newBuilder().setAuthorId(createdAuthor.getAuthor_id()).setName(Arrays.toString(createdAuthor.getName())).setBiography(createdAuthor.getBiography()).build();
 
             responseObserver.onNext(response);
