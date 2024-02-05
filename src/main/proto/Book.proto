@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package io.clh.bookstore;
+
+import "google/protobuf/timestamp.proto";
+
+service BookService {
+  rpc CreateBook(CreateBookRequest) returns (CreateBookResponse);
+  rpc GetBookById(GetBookByIdRequest) returns (GetBookByIdResponse);
+  rpc GetAllBooks(GetAllBooksRequest) returns (GetAllBooksResponse);
+  rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse);
+  rpc LinkBookWithAuthors(LinkBookWithAuthorsRequest) returns (LinkBookWithAuthorsResponse);
+}
+
+message Book {
+  int64 book_id = 1;
+  string title = 2;
+  string description = 3;
+  string isbn = 4;
+  google.protobuf.Timestamp publicationDate = 5;
+  double price = 6;
+  int32 stockQuantity = 7;
+  repeated int64 authorIds = 8;
+}
+
+message Author {
+  int64 author_id = 1;
+  string name = 2;
+  string biography = 3;
+  string avatar_url = 4;
+}
+
+message CreateBookRequest {
+  Book book = 1;
+}
+
+message GetBookByIdRequest {
+  int64 id = 1;
+}
+
+message GetAllBooksRequest {
+}
+
+message UpdateBookRequest {
+  Book book = 1;
+}
+
+message LinkBookWithAuthorsRequest {
+  int64 bookId = 1;
+  repeated int64 authorIds = 2;
+}
+
+// Define responses for our service methods
+message CreateBookResponse {
+  Book book = 1;
+}
+
+message GetBookByIdResponse {
+  Book book = 1;
+}
+
+message GetAllBooksResponse {
+  repeated Book books = 1;
+}
+
+message UpdateBookResponse {
+  Book book = 1;
+}
+
+message LinkBookWithAuthorsResponse {
+  Book book = 1;
+}
