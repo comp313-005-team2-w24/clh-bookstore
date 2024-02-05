@@ -24,7 +24,7 @@ public class Main {
          * gRPC server. use addService() to add new services (e.g. CRUD operations)
          */
         AuthorServiceGrpcImp authorServiceGrpcImp = new AuthorServiceGrpcImp(authorService);
-        BookServiceImp bookServiceImp = new BookServiceImp(bookService);
+        BookServiceImp bookServiceImp = new BookServiceImp(bookService, authorService);
 
         Server server = ServerBuilder.forPort(GRPC_SERVER_PORT).addService(authorServiceGrpcImp).addService(bookServiceImp).build();
 

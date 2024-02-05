@@ -50,7 +50,6 @@ message LinkBookWithAuthorsRequest {
   repeated int64 authorIds = 2;
 }
 
-// Define responses for our service methods
 message CreateBookResponse {
   Book book = 1;
 }
