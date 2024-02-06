@@ -3,7 +3,7 @@ package io.clh.main;
 import io.clh.bookstore.author.AuthorService;
 import io.clh.bookstore.author.AuthorServiceGrpcImp;
 import io.clh.bookstore.book.BookService;
-import io.clh.bookstore.book.BookServiceImp;
+import io.clh.bookstore.book.BookServiceGrpcImp;
 import io.clh.config.HibernateConfigUtil;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -24,9 +24,9 @@ public class Main {
          * gRPC server. use addService() to add new services (e.g. CRUD operations)
          */
         AuthorServiceGrpcImp authorServiceGrpcImp = new AuthorServiceGrpcImp(authorService);
-        BookServiceImp bookServiceImp = new BookServiceImp(bookService, authorService);
+        BookServiceGrpcImp bookServiceGrpcImp = new BookServiceGrpcImp(bookService, authorService);
 
-        Server server = ServerBuilder.forPort(GRPC_SERVER_PORT).addService(authorServiceGrpcImp).addService(bookServiceImp).build();
+        Server server = ServerBuilder.forPort(GRPC_SERVER_PORT).addService(authorServiceGrpcImp).addService(bookServiceGrpcImp).build();
 
         server.start();
         System.out.printf("Server started on port %s", GRPC_SERVER_PORT);

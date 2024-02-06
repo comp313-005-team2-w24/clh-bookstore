@@ -20,6 +20,6 @@ public class Author {
     private String biography;
     private String avatar_url;
 
-    @ManyToMany(mappedBy = "authors")
+    @ManyToMany(mappedBy = "authors", fetch = FetchType.EAGER)
     private Set<Book> books;
 }

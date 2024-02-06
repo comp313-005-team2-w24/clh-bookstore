@@ -5,7 +5,9 @@ import io.clh.models.Book;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
+import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -32,19 +34,24 @@ public class BookService implements IBook {
         }
     }
 
-    @Override
-    public Book getBookById(Long id) {
+    public Book getBookById(Integer bookId) {
         try (Session session = sessionFactory.openSession()) {
-            return session.get(Book.class, id);
-        } catch (RuntimeException e) {
-            throw e;
+            return session.createQuery(
+                            "SELECT b FROM Book b LEFT JOIN FETCH b.authors WHERE b.book_id = :bookId", Book.class)
+                    .setParameter("bookId", bookId)
+                    .uniqueResult();
         }
     }
 
     @Override
+    @Transactional
     public List<Book> getAllBooks() {
         try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("from Book", Book.class).list();
+            String sql = "SELECT * FROM books " +
+                    "FULL OUTER JOIN public.book_authors ba ON books.book_id = ba.book_id " +
+                    "ORDER BY books.book_id LIMIT 10 OFFSET 0";
+            List results = session.createNativeQuery(sql).list();
+            return results;
         }
     }
 
@@ -85,5 +92,18 @@ public class BookService implements IBook {
             }
             throw e;
         }
+    }
+
+    public Book getBookWithAuthors(Integer bookId) {
+        Book book = null;
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "SELECT b FROM Book b LEFT JOIN FETCH b.authors WHERE b.book_id = :bookId";
+            Query<Book> query = session.createQuery(hql, Book.class);
+            query.setParameter("bookId", bookId);
+            book = query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return book;
     }
 }

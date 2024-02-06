@@ -38,6 +38,7 @@ public class AuthorServiceTest {
         configuration.setProperty("hibernate.connection.url", postgresqlContainer.getJdbcUrl());
         configuration.setProperty("hibernate.connection.username", postgresqlContainer.getUsername());
         configuration.setProperty("hibernate.connection.password", postgresqlContainer.getPassword());
+        configuration.setImplicitNamingStrategy(new org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl());
         configuration.addAnnotatedClass(Author.class);
         configuration.addAnnotatedClass(Book.class);
 

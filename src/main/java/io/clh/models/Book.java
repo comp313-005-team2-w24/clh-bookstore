@@ -21,11 +21,16 @@ public class Book {
     private String title;
     private String description;
     private String isbn;
+
+    @Column(name = "publication_date")
     private java.sql.Date publicationDate;
+
     private Double price;
+
+    @Column(name = "stock_quantity")
     private Integer stockQuantity;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "book_authors",
             joinColumns = @JoinColumn(name = "book_id"),

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IBook {
     Book createBook(Book book);
-    Book getBookById(Long id);
+    Book getBookById(Integer bookId);
     List<Book> getAllBooks();
     Book updateBook(Book book);
     Book linkBookWithAuthors(Book book, Author ... authors);

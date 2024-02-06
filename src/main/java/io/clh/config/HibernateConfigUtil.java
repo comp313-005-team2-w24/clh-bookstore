@@ -39,6 +39,7 @@ public class HibernateConfigUtil {
         // Add annotated classes
         configuration.addAnnotatedClass(Author.class);
         configuration.addAnnotatedClass(Book.class);
+        configuration.setImplicitNamingStrategy(new org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl());
 
         return configuration.buildSessionFactory();
     }

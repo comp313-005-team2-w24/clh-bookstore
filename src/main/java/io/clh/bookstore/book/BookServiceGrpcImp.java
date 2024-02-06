@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class BookServiceImp extends BookServiceGrpc.BookServiceImplBase {
+public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
 
     private final BookService bookService;
     private final AuthorService authorService;
 
-    public BookServiceImp(BookService bookService, AuthorService authorService) {
+    public BookServiceGrpcImp(BookService bookService, AuthorService authorService) {
         this.bookService = bookService;
         this.authorService = authorService;
     }
@@ -26,12 +26,7 @@ public class BookServiceImp extends BookServiceGrpc.BookServiceImplBase {
     @Override
     public void createBook(BookOuterClass.CreateBookRequest request, StreamObserver<BookOuterClass.CreateBookResponse> responseObserver) {
         try {
-            Book book = new Book();
-            book.setTitle(request.getBook().getTitle());
-            book.setDescription(request.getBook().getDescription());
-            book.setIsbn(request.getBook().getIsbn());
-            book.setPrice(request.getBook().getPrice());
-            book.setStockQuantity(request.getBook().getStockQuantity());
+            Book book = this.convertFromBookProto(request.getBook());
 
             Book createdBook = bookService.createBook(book);
             BookOuterClass.Book responseBook = convertToBookProto(createdBook);
@@ -44,10 +39,11 @@ public class BookServiceImp extends BookServiceGrpc.BookServiceImplBase {
         }
     }
 
+
     @Override
     public void getBookById(BookOuterClass.GetBookByIdRequest request, StreamObserver<BookOuterClass.GetBookByIdResponse> responseObserver) {
         try {
-            Book book = bookService.getBookById(request.getId());
+            Book book = bookService.getBookWithAuthors((int) request.getId());
             if (book != null) {
                 BookOuterClass.Book responseBook = convertToBookProto(book);
                 BookOuterClass.GetBookByIdResponse response = BookOuterClass.GetBookByIdResponse.newBuilder().setBook(responseBook).build();
@@ -70,6 +66,7 @@ public class BookServiceImp extends BookServiceGrpc.BookServiceImplBase {
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             responseObserver.onError(e);
         }
     }
@@ -77,7 +74,6 @@ public class BookServiceImp extends BookServiceGrpc.BookServiceImplBase {
     @Override
     public void updateBook(BookOuterClass.UpdateBookRequest request, StreamObserver<BookOuterClass.UpdateBookResponse> responseObserver) {
         try {
-            // Similar to createBook, but with update logic
             Book bookToUpdate = convertFromBookProto(request.getBook());
             Book updatedBook = bookService.updateBook(bookToUpdate);
             BookOuterClass.Book responseBook = convertToBookProto(updatedBook);
@@ -93,9 +89,12 @@ public class BookServiceImp extends BookServiceGrpc.BookServiceImplBase {
     @Override
     public void linkBookWithAuthors(BookOuterClass.LinkBookWithAuthorsRequest request, StreamObserver<BookOuterClass.LinkBookWithAuthorsResponse> responseObserver) {
         try {
-            Book book = bookService.getBookById(request.getBookId());
-            Set<Author> authors = request.getAuthorIdsList().stream().map(id -> new Author()).collect(Collectors.toSet());
-            Book updatedBook = bookService.linkBookWithAuthors(book, authors.toArray(new Author[0]));
+            Book book = bookService.getBookWithAuthors((int) request.getBookId());
+            Book updatedBook = bookService.linkBookWithAuthors(book,
+                    request.getAuthorIdsList()
+                            .stream()
+                            .map(id -> new Author()).distinct().toArray(Author[]::new)
+            );
 
             BookOuterClass.Book responseBook = convertToBookProto(updatedBook);
             BookOuterClass.LinkBookWithAuthorsResponse response = BookOuterClass.LinkBookWithAuthorsResponse.newBuilder().setBook(responseBook).build();
@@ -106,7 +105,6 @@ public class BookServiceImp extends BookServiceGrpc.BookServiceImplBase {
             responseObserver.onError(e);
         }
     }
-
 
 
     private BookOuterClass.Book convertToBookProto(Book book) {
