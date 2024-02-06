@@ -5,13 +5,10 @@ import io.clh.models.Book;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
+import org.hibernate.type.StandardBasicTypes;
 
-import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.sql.Date;
+import java.util.*;
 
 public class BookService implements IBook {
     private final SessionFactory sessionFactory;
@@ -34,24 +31,54 @@ public class BookService implements IBook {
         }
     }
 
-    public Book getBookById(Integer bookId) {
-        try (Session session = sessionFactory.openSession()) {
-            return session.createQuery(
-                            "SELECT b FROM Book b LEFT JOIN FETCH b.authors WHERE b.book_id = :bookId", Book.class)
-                    .setParameter("bookId", bookId)
-                    .uniqueResult();
-        }
-    }
-
     @Override
-    @Transactional
     public List<Book> getAllBooks() {
         try (Session session = sessionFactory.openSession()) {
-            String sql = "SELECT * FROM books " +
+            String sql = "SELECT books.book_id AS bookId, books.title, books.description, books.isbn, books.publication_date AS publicationDate, books.price, books.stock_quantity AS stockQuantity, " +
+                    "ba.author_id AS authorId " +
+                    "FROM books " +
                     "FULL OUTER JOIN public.book_authors ba ON books.book_id = ba.book_id " +
                     "ORDER BY books.book_id LIMIT 10 OFFSET 0";
-            List results = session.createNativeQuery(sql).list();
-            return results;
+
+            List<Object[]> results = session.createNativeQuery(sql)
+                    .addScalar("bookId", StandardBasicTypes.LONG) // Use appropriate types
+                    .addScalar("title", StandardBasicTypes.STRING)
+                    .addScalar("description", StandardBasicTypes.STRING)
+                    .addScalar("isbn", StandardBasicTypes.STRING)
+                    .addScalar("publicationDate", StandardBasicTypes.DATE)
+                    .addScalar("price", StandardBasicTypes.DOUBLE)
+                    .addScalar("stockQuantity", StandardBasicTypes.INTEGER)
+                    .addScalar("authorId", StandardBasicTypes.LONG)
+                    .getResultList();
+
+            Map<Integer, Book> booksMap = new HashMap<>();
+
+            for (Object[] row : results) {
+                Integer bookId = ((Long) row[0]).intValue();
+                Book book = booksMap.get(bookId);
+
+                if (book == null) {
+                    book = new Book();
+                    book.setBook_id(bookId);
+                    book.setTitle((String) row[1]);
+                    book.setDescription((String) row[2]);
+                    book.setIsbn((String) row[3]);
+                    book.setPublicationDate((Date) row[4]);
+                    book.setPrice(Double.valueOf(row[5].toString()));
+                    book.setStockQuantity((Integer) row[6]);
+                    book.setAuthors(new HashSet<>());
+                    booksMap.put(bookId, book);
+                }
+
+                Long authorId = (Long) row[7];
+                if (authorId != null) {
+                    Author author = new Author();
+                    author.setAuthor_id(authorId.intValue());
+                    book.getAuthors().add(author);
+                }
+            }
+
+            return new ArrayList<>(booksMap.values());
         }
     }
 
@@ -70,6 +97,55 @@ public class BookService implements IBook {
             throw e;
         }
     }
+
+    @Override
+    public Book getBookById(int bookId) {
+        try (Session session = sessionFactory.openSession()) {
+            String sql = "SELECT books.book_id AS bookId, books.title, books.description, books.isbn, books.publication_date AS publicationDate, books.price, books.stock_quantity AS stockQuantity, " +
+                    "ba.author_id AS authorId " +
+                    "FROM books " +
+                    "LEFT JOIN public.book_authors ba ON books.book_id = ba.book_id " +
+                    "WHERE books.book_id = :bookId";
+
+            List<Object[]> results = session.createNativeQuery(sql)
+                    .setParameter("bookId", bookId)
+                    .addScalar("bookId", StandardBasicTypes.LONG) // Use appropriate types
+                    .addScalar("title", StandardBasicTypes.STRING)
+                    .addScalar("description", StandardBasicTypes.STRING)
+                    .addScalar("isbn", StandardBasicTypes.STRING)
+                    .addScalar("publicationDate", StandardBasicTypes.DATE)
+                    .addScalar("price", StandardBasicTypes.DOUBLE)
+                    .addScalar("stockQuantity", StandardBasicTypes.INTEGER)
+                    .addScalar("authorId", StandardBasicTypes.LONG)
+                    .getResultList();
+
+            Book book = null;
+
+            for (Object[] row : results) {
+                if (book == null) {
+                    book = new Book();
+                    book.setBook_id(((Long) row[0]).intValue());
+                    book.setTitle((String) row[1]);
+                    book.setDescription((String) row[2]);
+                    book.setIsbn((String) row[3]);
+                    book.setPublicationDate((Date) row[4]);
+                    book.setPrice(Double.valueOf(row[5].toString()));
+                    book.setStockQuantity((Integer) row[6]);
+                    book.setAuthors(new HashSet<>());
+                }
+
+                Long authorId = (Long) row[7];
+                if (authorId != null) {
+                    Author author = new Author();
+                    author.setAuthor_id(authorId.intValue());
+                    book.getAuthors().add(author);
+                }
+            }
+
+            return book;
+        }
+    }
+
 
     @Override
     public Book linkBookWithAuthors(Book book, Author... authors) {
@@ -94,16 +170,4 @@ public class BookService implements IBook {
         }
     }
 
-    public Book getBookWithAuthors(Integer bookId) {
-        Book book = null;
-        try (Session session = sessionFactory.openSession()) {
-            String hql = "SELECT b FROM Book b LEFT JOIN FETCH b.authors WHERE b.book_id = :bookId";
-            Query<Book> query = session.createQuery(hql, Book.class);
-            query.setParameter("bookId", bookId);
-            book = query.uniqueResult();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return book;
-    }
 }

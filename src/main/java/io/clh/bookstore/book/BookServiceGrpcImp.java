@@ -43,7 +43,7 @@ public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
     @Override
     public void getBookById(BookOuterClass.GetBookByIdRequest request, StreamObserver<BookOuterClass.GetBookByIdResponse> responseObserver) {
         try {
-            Book book = bookService.getBookWithAuthors((int) request.getId());
+            Book book = bookService.getBookById((int) request.getId());
             if (book != null) {
                 BookOuterClass.Book responseBook = convertToBookProto(book);
                 BookOuterClass.GetBookByIdResponse response = BookOuterClass.GetBookByIdResponse.newBuilder().setBook(responseBook).build();
@@ -89,7 +89,8 @@ public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
     @Override
     public void linkBookWithAuthors(BookOuterClass.LinkBookWithAuthorsRequest request, StreamObserver<BookOuterClass.LinkBookWithAuthorsResponse> responseObserver) {
         try {
-            Book book = bookService.getBookWithAuthors((int) request.getBookId());
+            Book book = bookService.getBookById((int) request.getBookId());
+            //TODO: Fix
             Book updatedBook = bookService.linkBookWithAuthors(book,
                     request.getAuthorIdsList()
                             .stream()
@@ -160,6 +161,7 @@ public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
 
         Set<Author> authors = new HashSet<>();
         for (long authorId : bookProto.getAuthorIdsList()) {
+            // todo: fix
             Author author = authorService.getAuthorById((int) authorId);
             if (author != null) {
                 authors.add(author);
