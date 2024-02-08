@@ -1,6 +1,7 @@
 package io.clh.config;
 
 import io.clh.models.Author;
+import io.clh.models.Book;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
@@ -30,13 +31,14 @@ public class HibernateConfigUtil {
         settings.put(Environment.PASS, POSTGRES_PASS);
         settings.put(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
         settings.put(Environment.SHOW_SQL, "true");
-        settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
         settings.put(Environment.HBM2DDL_AUTO, "update");
 
         configuration.setProperties(settings);
 
         // Add annotated classes
         configuration.addAnnotatedClass(Author.class);
+        configuration.addAnnotatedClass(Book.class);
+        configuration.setImplicitNamingStrategy(new org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl());
 
         return configuration.buildSessionFactory();
     }

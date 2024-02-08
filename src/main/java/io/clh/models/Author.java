@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @RequiredArgsConstructor()
@@ -20,4 +21,7 @@ public class Author {
     private char[] name;
     private String biography;
     private String avatar_url;
+
+    @ManyToMany(mappedBy = "authors", fetch = FetchType.EAGER)
+    private Set<Book> books;
 }
