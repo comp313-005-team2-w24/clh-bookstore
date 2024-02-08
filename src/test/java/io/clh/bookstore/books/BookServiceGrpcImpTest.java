@@ -96,7 +96,7 @@ public class BookServiceGrpcImpTest {
     @Order(1)
     public void createBook() {
         AuthorService authorService = new AuthorService(sessionFactory);
-        BookService bookService = new BookService(sessionFactory);
+        BookService bookService = new BookService(sessionFactory, authorService);
 
         Author author = new Author();
         author.setName("Author Name".toCharArray());
@@ -119,10 +119,6 @@ public class BookServiceGrpcImpTest {
         bookService.createBook(book);
         tx.commit();
 
-        tx = session.beginTransaction();
-        bookService.linkBookWithAuthors(book, author);
-        tx.commit();
-
         Assertions.assertTrue(book.getBook_id() > 0);
         Assertions.assertTrue(author.getAuthor_id() > 0);
     }
@@ -131,10 +127,11 @@ public class BookServiceGrpcImpTest {
     @Test
     @Order(2)
     public void GetBookByIdNotEmpty(){
-        BookService bookService = new BookService(sessionFactory);
+        AuthorService authorService = new AuthorService(sessionFactory);
+        BookService bookService = new BookService(sessionFactory, authorService);
 
         Transaction tx = session.beginTransaction();
-        Book retrievedBook = bookService.getBookWithAuthors(1);
+        Book retrievedBook = bookService.getBookById(1);
         tx.commit();
         //TODO: fix test. Required add new author and book row for setUp() function
 

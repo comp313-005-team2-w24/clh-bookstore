@@ -1,5 +1,6 @@
 package io.clh.bookstore.book;
 
+import io.clh.bookstore.author.AuthorService;
 import io.clh.models.Author;
 import io.clh.models.Book;
 import org.hibernate.Session;
@@ -7,14 +8,19 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.type.StandardBasicTypes;
 
+import javax.persistence.criteria.*;
 import java.sql.Date;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BookService implements IBook {
     private final SessionFactory sessionFactory;
+    private final AuthorService authorService;
 
-    public BookService(SessionFactory sessionFactory) {
+    public BookService(SessionFactory sessionFactory, AuthorService authorService) {
         this.sessionFactory = sessionFactory;
+
+        this.authorService = authorService;
     }
 
     @Override
@@ -83,6 +89,18 @@ public class BookService implements IBook {
     }
 
     @Override
+    public Set<Book> findBooksByAuthorId(int authorId) {
+        try (Session session = sessionFactory.openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Book> cq = cb.createQuery(Book.class);
+            Root<Author> author = cq.from(Author.class);
+            Join<Author, Book> books = author.join("books", JoinType.INNER);
+            cq.select(books).where(cb.equal(author.get("author_id"), authorId));
+            return new HashSet<>(session.createQuery(cq).getResultList());
+        }
+    }
+
+    @Override
     public Book updateBook(Book book) {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
@@ -147,21 +165,33 @@ public class BookService implements IBook {
     }
 
 
-    @Override
-    public Book linkBookWithAuthors(Book book, Author... authors) {
+    public Book linkBookWithAuthors(Long bookId, Set<Long> authorIds) {
+        //todo: do manually as an example above
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            Book persistedBook = session.get(Book.class, book.getBook_id());
-            if (persistedBook != null) {
-                Set<Author> authorSet = new HashSet<>(Arrays.asList(authors));
-                persistedBook.setAuthors(authorSet);
-                session.update(persistedBook);
-                transaction.commit();
-                return persistedBook;
-            } else {
-                throw new IllegalArgumentException("Book not found with provided ID");
+
+            // Fetch the book
+            Book book = session.get(Book.class, bookId.intValue());
+            if (book == null) {
+                throw new IllegalArgumentException("Book not found with provided ID: " + bookId);
             }
+
+            Author authorById = authorService.getAuthorById(1);
+            Set<Author> authors = authorIds.stream()
+                    .map(id -> authorService.getAuthorById(id.intValue()))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+
+            if (authors.isEmpty()) {
+                throw new IllegalArgumentException("No valid authors found for provided IDs");
+            }
+
+            book.setAuthors(authors);
+            session.saveOrUpdate(book);
+            transaction.commit();
+
+            return book;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();

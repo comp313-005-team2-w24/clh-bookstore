@@ -1,6 +1,10 @@
 package io.clh.bookstore.author;
 
+import io.clh.bookstore.book.BookService;
+import io.clh.bookstore.untils.DtoProtoConversions;
 import io.clh.models.Author;
+import io.clh.models.Book;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 import java.util.Arrays;
@@ -8,9 +12,11 @@ import java.util.List;
 
 public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBase {
     private final AuthorService authorService;
+    private final BookService bookService;
 
-    public AuthorServiceGrpcImp(AuthorService authorService) {
+    public AuthorServiceGrpcImp(AuthorService authorService, BookService bookService) {
         this.authorService = authorService;
+        this.bookService = bookService;
     }
 
     @Override
@@ -60,22 +66,31 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             }
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
 
     @Override
-    public void getAuthorById(AuthorByIdRequest request, StreamObserver<AuthorEntity> responseObserver) {
+    public void getAuthorById(AuthorByIdRequest request, StreamObserver<GetAuthorByIdResponse> responseObserver) {
         try {
             long authorId = request.getAuthorId();
             Author authorById = authorService.getAuthorById((int) authorId);
+            List<Book> booksByAuthorId = bookService.findBooksByAuthorId(authorById.getAuthor_id()).stream().toList();
 
-            AuthorEntity response = AuthorEntity.newBuilder()
+            DtoProtoConversions dtoProtoConversions = new DtoProtoConversions();
+
+            AuthorEntity authorEntity = AuthorEntity.newBuilder()
                     .setAuthorId(authorById.getAuthor_id())
                     .setName(new String(authorById.getName()))
                     .setBiography(authorById.getBiography())
                     .setAvatarUrl(authorById.getAvatar_url())
                     .build();
+
+            List<io.clh.bookstore.author.Book> collect = booksByAuthorId.stream().map(DtoProtoConversions::convertToBookStoreAuthorBookProto).toList();
+
+            GetAuthorByIdResponse response = GetAuthorByIdResponse.newBuilder()
+                    .setAuthor(authorEntity)
+                    .addAllBooks(collect).build();
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();

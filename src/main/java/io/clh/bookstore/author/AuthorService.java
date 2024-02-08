@@ -38,6 +38,7 @@ public class AuthorService implements IAuthor {
         return author;
     }
 
+
     @Override
     public List<Author> getAllAuthors() {
         Session session = sessionFactory.openSession();

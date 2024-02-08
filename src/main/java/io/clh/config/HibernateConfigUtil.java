@@ -31,7 +31,6 @@ public class HibernateConfigUtil {
         settings.put(Environment.PASS, POSTGRES_PASS);
         settings.put(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
         settings.put(Environment.SHOW_SQL, "true");
-        settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
         settings.put(Environment.HBM2DDL_AUTO, "update");
 
         configuration.setProperties(settings);

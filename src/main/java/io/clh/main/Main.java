@@ -18,12 +18,12 @@ public class Main {
          * Hibernate services used for implement CRUD operations Postgresql
          */
         AuthorService authorService = new AuthorService(HibernateConfigUtil.createSessionFactory());
-        BookService bookService = new BookService(HibernateConfigUtil.createSessionFactory());
+        BookService bookService = new BookService(HibernateConfigUtil.createSessionFactory(), authorService);
 
         /*
          * gRPC server. use addService() to add new services (e.g. CRUD operations)
          */
-        AuthorServiceGrpcImp authorServiceGrpcImp = new AuthorServiceGrpcImp(authorService);
+        AuthorServiceGrpcImp authorServiceGrpcImp = new AuthorServiceGrpcImp(authorService, bookService);
         BookServiceGrpcImp bookServiceGrpcImp = new BookServiceGrpcImp(bookService, authorService);
 
         Server server = ServerBuilder.forPort(GRPC_SERVER_PORT).addService(authorServiceGrpcImp).addService(bookServiceGrpcImp).build();
