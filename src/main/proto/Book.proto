@@ -9,7 +9,7 @@ service BookService {
   rpc GetBookById(GetBookByIdRequest) returns (GetBookByIdResponse);
   rpc GetAllBooks(GetAllBooksRequest) returns (GetAllBooksResponse);
   rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse);
-  rpc LinkBookWithAuthors(LinkBookWithAuthorsRequest) returns (LinkBookWithAuthorsResponse);
+//  rpc LinkBookWithAuthors(LinkBookWithAuthorsRequest) returns (LinkBookWithAuthorsResponse);
 }
 
 message Book {
@@ -45,10 +45,14 @@ message UpdateBookRequest {
   Book book = 1;
 }
 
-message LinkBookWithAuthorsRequest {
-  int64 bookId = 1;
-  repeated int64 authorIds = 2;
-}
+//message LinkBookWithAuthorsRequest {
+//  int64 bookId = 1;
+//  repeated int64 authorIds = 2;
+//}
+//
+//message LinkBookWithAuthorsResponse {
+//  Book book = 1;
+//}
 
 message CreateBookResponse {
   Book book = 1;
@@ -66,6 +70,3 @@ message UpdateBookResponse {
   Book book = 1;
 }
 
-message LinkBookWithAuthorsResponse {
-  Book book = 1;
-}

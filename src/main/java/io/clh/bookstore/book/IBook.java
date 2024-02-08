@@ -13,7 +13,7 @@ public interface IBook {
 
     Book getBookById(int bookId);
 
-    Book linkBookWithAuthors(Long bookId, Set<Long> authorIds);
+//    Book linkBookWithAuthors(Long bookId, Set<Long> authorIds);
 
     Set<Book> findBooksByAuthorId(int authorId);
 }

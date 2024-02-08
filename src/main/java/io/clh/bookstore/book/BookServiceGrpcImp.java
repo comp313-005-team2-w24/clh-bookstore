@@ -90,20 +90,20 @@ public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
         }
     }
 
-    @Override
-    public void linkBookWithAuthors(BookOuterClass.LinkBookWithAuthorsRequest request, StreamObserver<BookOuterClass.LinkBookWithAuthorsResponse> responseObserver) {
-        try {
-            Set<Long> authorIds = new HashSet<>(request.getAuthorIdsList());
-            Book updatedBook = bookService.linkBookWithAuthors(request.getBookId(), authorIds);
-
-            BookOuterClass.Book responseBook = convertToBookOuterBookProto(updatedBook);
-            BookOuterClass.LinkBookWithAuthorsResponse response = BookOuterClass.LinkBookWithAuthorsResponse.newBuilder().setBook(responseBook).build();
-
-            responseObserver.onNext(response);
-            responseObserver.onCompleted();
-        } catch (Exception e) {
-            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
-        }
-    }
+//    @Override
+//    public void linkBookWithAuthors(BookOuterClass.LinkBookWithAuthorsRequest request, StreamObserver<BookOuterClass.LinkBookWithAuthorsResponse> responseObserver) {
+//        try {
+//            Set<Long> authorIds = new HashSet<>(request.getAuthorIdsList());
+//            Book updatedBook = bookService.linkBookWithAuthors(request.getBookId(), authorIds);
+//
+//            BookOuterClass.Book responseBook = convertToBookOuterBookProto(updatedBook);
+//            BookOuterClass.LinkBookWithAuthorsResponse response = BookOuterClass.LinkBookWithAuthorsResponse.newBuilder().setBook(responseBook).build();
+//
+//            responseObserver.onNext(response);
+//            responseObserver.onCompleted();
+//        } catch (Exception e) {
+//            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+//        }
+//    }
 
 }

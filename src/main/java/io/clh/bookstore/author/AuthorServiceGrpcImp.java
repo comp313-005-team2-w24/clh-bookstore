@@ -77,8 +77,6 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             Author authorById = authorService.getAuthorById((int) authorId);
             List<Book> booksByAuthorId = bookService.findBooksByAuthorId(authorById.getAuthor_id()).stream().toList();
 
-            DtoProtoConversions dtoProtoConversions = new DtoProtoConversions();
-
             AuthorEntity authorEntity = AuthorEntity.newBuilder()
                     .setAuthorId(authorById.getAuthor_id())
                     .setName(new String(authorById.getName()))

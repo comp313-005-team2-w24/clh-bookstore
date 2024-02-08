@@ -41,6 +41,7 @@ public class AuthorService implements IAuthor {
 
     @Override
     public List<Author> getAllAuthors() {
+        // TODO: ADD LIMIT AND OFFSET
         Session session = sessionFactory.openSession();
         List<Author> authors = session.createQuery("from Author", Author.class).list();
         session.close();
