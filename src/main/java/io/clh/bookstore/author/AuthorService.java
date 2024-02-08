@@ -40,13 +40,20 @@ public class AuthorService implements IAuthor {
 
 
     @Override
-    public List<Author> getAllAuthors() {
-        // TODO: ADD LIMIT AND OFFSET
-        Session session = sessionFactory.openSession();
-        List<Author> authors = session.createQuery("from Author", Author.class).list();
-        session.close();
-        return authors;
+    public List<Author> getAllAuthors(int page) {
+        final int pageSize = 50;
+        try (Session session = sessionFactory.openSession()) {
+            int firstResult = (page - 1) * pageSize;
+
+            return session.createQuery("from Author", Author.class)
+                    .setFirstResult(firstResult)
+                    .setMaxResults(pageSize)
+                    .list();
+        } catch (RuntimeException e) {
+            throw e;
+        }
     }
+
 
     @Override
     public Author setUrlAvatar(String url, Integer id) {

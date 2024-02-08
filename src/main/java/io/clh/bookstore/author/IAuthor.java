@@ -9,7 +9,7 @@ public interface IAuthor {
 
     Author getAuthorById(Integer id);
 
-    List<Author> getAllAuthors();
+    List<Author> getAllAuthors(int page);
 
     Author setUrlAvatar(String url, Integer id) throws IllegalAccessException;
 }

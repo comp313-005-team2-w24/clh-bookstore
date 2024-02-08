@@ -131,7 +131,7 @@ public class AuthorServiceTest {
     @Order(2)
     public void getAllAuthorsShouldNotBeEmpty() {
         AuthorService authorService = new AuthorService(sessionFactory);
-        List<Author> authors = authorService.getAllAuthors();
+        List<Author> authors = authorService.getAllAuthors(1);
 
         assertFalse(authors.isEmpty(), "The list of authors should not be empty");
     }

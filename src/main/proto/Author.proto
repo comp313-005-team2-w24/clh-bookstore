@@ -50,6 +50,7 @@ message CreateAuthorRequest {
 }
 
 message GetAllAuthorsRequest {
+  optional int32 page = 1;
 }
 
 message GetAllAuthorsResponse {

@@ -45,14 +45,16 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
 
     @Override
     public void getAllAuthors(GetAllAuthorsRequest request, StreamObserver<AuthorEntity> responseObserver) {
         try {
-            List<Author> authors = authorService.getAllAuthors();
+            int limitPages = request.getPage() == 0 ? 1 : request.getPage();
+
+            List<Author> authors = authorService.getAllAuthors(limitPages);
 
             for (Author author : authors) {
                 AuthorEntity response = AuthorEntity.newBuilder()
@@ -93,7 +95,7 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
 
@@ -115,7 +117,7 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
-            responseObserver.onError(e);
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
 }

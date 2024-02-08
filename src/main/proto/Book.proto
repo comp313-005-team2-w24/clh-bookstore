@@ -9,7 +9,6 @@ service BookService {
   rpc GetBookById(GetBookByIdRequest) returns (GetBookByIdResponse);
   rpc GetAllBooks(GetAllBooksRequest) returns (GetAllBooksResponse);
   rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse);
-//  rpc LinkBookWithAuthors(LinkBookWithAuthorsRequest) returns (LinkBookWithAuthorsResponse);
 }
 
 message Book {
@@ -39,6 +38,7 @@ message GetBookByIdRequest {
 }
 
 message GetAllBooksRequest {
+  optional int32 page = 1;
 }
 
 message UpdateBookRequest {

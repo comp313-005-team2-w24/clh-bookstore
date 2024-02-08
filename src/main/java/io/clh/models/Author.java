@@ -1,9 +1,11 @@
 package io.clh.models;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Arrays;
 import java.util.Set;
 
 @Entity
@@ -20,8 +22,6 @@ public class Author {
     private String biography;
     private String avatar_url;
 
-
-    //TODO: Fix
     @ManyToMany(mappedBy = "authors", fetch = FetchType.EAGER)
     private Set<Book> books;
 }
