@@ -20,6 +20,7 @@ message Book {
   double price = 6;
   int32 stockQuantity = 7;
   repeated int64 authorIds = 8;
+  string avatar_url = 9;
 }
 
 message GetAuthorByIdResponse{

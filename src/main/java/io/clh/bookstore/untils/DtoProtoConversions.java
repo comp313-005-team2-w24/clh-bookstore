@@ -29,6 +29,7 @@ public class DtoProtoConversions {
                 .setIsbn(book.getIsbn())
                 .setDescription(book.getDescription())
                 .setTitle(book.getTitle())
+                .setAvatarUrl(book.getAvatar_url())
                 .setStockQuantity(book.getStockQuantity());
 
         if (timestamp != null) {
@@ -64,6 +65,7 @@ public class DtoProtoConversions {
                 .setIsbn(book.getIsbn())
                 .setDescription(book.getDescription())
                 .setTitle(book.getTitle())
+                .setAvatarUrl(book.getAvatar_url())
                 .setStockQuantity(book.getStockQuantity());
 
         if (timestamp != null) {
@@ -91,6 +93,7 @@ public class DtoProtoConversions {
         book.setIsbn(bookProto.getIsbn());
         book.setPrice(bookProto.getPrice());
         book.setStockQuantity(bookProto.getStockQuantity());
+        book.setAvatar_url(bookProto.getAvatarUrl());
 
         if (bookProto.hasPublicationDate()) {
             Timestamp ts = bookProto.getPublicationDate();

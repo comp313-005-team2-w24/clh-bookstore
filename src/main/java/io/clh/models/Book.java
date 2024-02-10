@@ -30,6 +30,8 @@ public class Book {
     @Column(name = "stock_quantity")
     private Integer stockQuantity;
 
+    private String avatar_url;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "book_authors",
