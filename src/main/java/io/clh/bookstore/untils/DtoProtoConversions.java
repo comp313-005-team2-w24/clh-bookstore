@@ -35,6 +35,10 @@ public class DtoProtoConversions {
             bookBuilder.setPublicationDate(timestamp);
         }
 
+        if (book.getAvatar_url() != null) {
+            bookBuilder.setAvatarUrl(book.getAvatar_url());
+        }
+
         // Convert Set<Author> to a list of author IDs and add it to the book builder
         if (book.getAuthors() != null && !book.getAuthors().isEmpty()) {
             List<Long> authorIds = book.getAuthors().stream()
@@ -58,6 +62,7 @@ public class DtoProtoConversions {
                     .build();
         }
 
+
         io.clh.bookstore.author.Book.Builder bookBuilder = io.clh.bookstore.author.Book.newBuilder()
                 .setBookId(book.getBook_id())
                 .setPrice(book.getPrice())
@@ -65,6 +70,11 @@ public class DtoProtoConversions {
                 .setDescription(book.getDescription())
                 .setTitle(book.getTitle())
                 .setStockQuantity(book.getStockQuantity());
+
+
+        if (book.getAvatar_url() != null) {
+            bookBuilder.setAvatarUrl(book.getAvatar_url());
+        }
 
         if (timestamp != null) {
             bookBuilder.setPublicationDate(timestamp);
@@ -91,6 +101,7 @@ public class DtoProtoConversions {
         book.setIsbn(bookProto.getIsbn());
         book.setPrice(bookProto.getPrice());
         book.setStockQuantity(bookProto.getStockQuantity());
+        book.setAvatar_url(bookProto.getAvatarUrl());
 
         if (bookProto.hasPublicationDate()) {
             Timestamp ts = bookProto.getPublicationDate();

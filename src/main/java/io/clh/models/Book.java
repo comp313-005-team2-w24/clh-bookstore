@@ -1,9 +1,6 @@
 package io.clh.models;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -13,6 +10,7 @@ import java.util.Set;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Data
 @Table(name = "books")
+@ToString
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +27,9 @@ public class Book {
 
     @Column(name = "stock_quantity")
     private Integer stockQuantity;
+
+    @Column(name = "avatar_url")
+    private String avatar_url;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

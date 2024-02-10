@@ -65,6 +65,7 @@ public class AuthorServiceTest {
                     "    publication_date DATE," +
                     "    price DECIMAL(10, 2)," +
                     "    stock_quantity INT," +
+                    "    avatar_url VARCHAR(255)," +
                     "    category_id INT" +
                     ");");
 
@@ -102,13 +103,17 @@ public class AuthorServiceTest {
     public void createAuthor() {
         AuthorService authorService = new AuthorService(sessionFactory);
         Book book = new Book();
+
+        Set<Book> emptySet = Set.of();
+
+
         Author author = new Author(1, "username".toCharArray(), "my biblio", "",
-                Set.of(book)
+                emptySet
         );
 
         session.beginTransaction();
         authorService.addAuthor(author);
-        Author retrievedAuthor = authorService.getAuthorById(1);
+        Author retrievedAuthor = authorService.getAuthorById(author.getAuthor_id());
         session.getTransaction().commit();
 
         Assertions.assertNotNull(retrievedAuthor);

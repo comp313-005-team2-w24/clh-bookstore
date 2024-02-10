@@ -63,6 +63,7 @@ public class BookServiceGrpcImpTest {
                     "    publication_date DATE," +
                     "    price DECIMAL(10, 2)," +
                     "    stock_quantity INT," +
+                    "    avatar_url VARCHAR(255)," +
                     "    category_id INT" +
                     ");");
 
@@ -113,6 +114,7 @@ public class BookServiceGrpcImpTest {
         book.setIsbn("1234567890");
         book.setPrice(19.99);
         book.setStockQuantity(100);
+        book.setAvatar_url("http://example.com/image.png");
         book.setPublicationDate(new Date(System.currentTimeMillis()));
 
         tx = session.beginTransaction();

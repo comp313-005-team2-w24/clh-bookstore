@@ -76,6 +76,8 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
     public void getAuthorById(AuthorByIdRequest request, StreamObserver<GetAuthorByIdResponse> responseObserver) {
         try {
             long authorId = request.getAuthorId();
+
+            // TODO: Fix as get book by id
             Author authorById = authorService.getAuthorById((int) authorId);
             List<Book> booksByAuthorId = bookService.findBooksByAuthorId(authorById.getAuthor_id()).stream().toList();
 
