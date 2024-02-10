@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class AuthorServiceHibernate {
+public class AuthorServiceHibernateTest {
     private static SessionFactory sessionFactory;
     private static Session session;
 

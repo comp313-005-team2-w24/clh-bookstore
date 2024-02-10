@@ -20,7 +20,7 @@ import java.sql.Statement;
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class BookServiceHibernate {
+public class BookServiceHibernateTest {
     private static SessionFactory sessionFactory;
     private static Session session;
 
