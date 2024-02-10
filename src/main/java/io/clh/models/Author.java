@@ -1,9 +1,6 @@
 package io.clh.models;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -13,6 +10,7 @@ import java.util.Set;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Data
 @Table(name = "authors")
+@ToString
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
