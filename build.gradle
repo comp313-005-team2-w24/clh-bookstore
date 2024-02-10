@@ -75,6 +75,9 @@ dependencies {
 
     // PostgreSQL JDBC Driver
     implementation 'org.postgresql:postgresql:42.2.5'
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.1'
+
 }
 
 test {

@@ -1,6 +1,10 @@
 package io.clh.models;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -10,7 +14,6 @@ import java.util.Set;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Data
 @Table(name = "authors")
-@ToString
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,5 +24,6 @@ public class Author {
     private String avatar_url;
 
     @ManyToMany(mappedBy = "authors", fetch = FetchType.EAGER)
+    @JsonIgnore
     private Set<Book> books;
 }

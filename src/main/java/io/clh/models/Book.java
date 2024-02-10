@@ -28,6 +28,7 @@ public class Book {
     @Column(name = "stock_quantity")
     private Integer stockQuantity;
 
+    @Column(name = "avatar_url")
     private String avatar_url;
 
     @ManyToMany(fetch = FetchType.EAGER)

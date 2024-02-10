@@ -65,6 +65,7 @@ public class AuthorServiceTest {
                     "    publication_date DATE," +
                     "    price DECIMAL(10, 2)," +
                     "    stock_quantity INT," +
+                    "    avatar_url VARCHAR(255)," +
                     "    category_id INT" +
                     ");");
 
