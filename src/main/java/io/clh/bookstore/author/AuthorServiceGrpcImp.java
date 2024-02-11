@@ -2,10 +2,12 @@ package io.clh.bookstore.author;
 
 import io.clh.bookstore.book.BookService;
 import io.clh.bookstore.untils.DtoProtoConversions;
+import io.clh.bookstore.untils.Metrics;
 import io.clh.models.Author;
 import io.clh.models.Book;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import io.prometheus.client.Histogram;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +30,9 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
          */
 
         try {
+            Metrics.incrementTotalRequests();
+            Histogram.Timer requestTimer = Metrics.startRequestTimer();
+
             io.clh.models.Author author = new Author();
             author.setName(request.getName().toCharArray());
             author.setBiography(request.getBiography());
@@ -44,6 +49,9 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+
+            requestTimer.observeDuration();
+
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
@@ -52,8 +60,10 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
     @Override
     public void getAllAuthors(GetAllAuthorsRequest request, StreamObserver<AuthorEntity> responseObserver) {
         try {
-            int limitPages = request.getPage() == 0 ? 1 : request.getPage();
+            Metrics.incrementTotalRequests();
+            Histogram.Timer requestTimer = Metrics.startRequestTimer();
 
+            int limitPages = request.getPage() == 0 ? 1 : request.getPage();
             List<Author> authors = authorService.getAllAuthors(limitPages);
 
             for (Author author : authors) {
@@ -65,6 +75,8 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
                         .build();
 
                 responseObserver.onNext(response);
+
+                requestTimer.observeDuration();
             }
             responseObserver.onCompleted();
         } catch (Exception e) {
@@ -75,6 +87,9 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
     @Override
     public void getAuthorById(AuthorByIdRequest request, StreamObserver<GetAuthorByIdResponse> responseObserver) {
         try {
+            Metrics.incrementTotalRequests();
+            Histogram.Timer requestTimer = Metrics.startRequestTimer();
+
             long authorId = request.getAuthorId();
 
             // TODO: Fix as get book by id
@@ -96,6 +111,8 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+
+            requestTimer.observeDuration();
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
@@ -107,6 +124,9 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
         String avatarUrl = request.getAvatarUrl();
 
         try {
+            Metrics.incrementTotalRequests();
+            Histogram.Timer requestTimer = Metrics.startRequestTimer();
+
             Author author = authorService.setUrlAvatar(avatarUrl, (int) authorId);
 
             AuthorEntity response = AuthorEntity.newBuilder()
@@ -118,6 +138,9 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+
+            requestTimer.observeDuration();
+
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
