@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.clh.bookstore.publisher";
+
+service PublisherService {
+ rpc CreatePublisher(CreatePublisherRequest) returns (PublisherEntity);
+ rpc GetAllPublisher(GetAllPublisherRequest) returns (stream PublisherEntity);
+ rpc GetPublisherById(PublisherByIdRequest) returns (PublisherEntity);
+}
+
+message PublisherByIdRequest{
+ int32 id = 1;
+}
+
+message CreatePublisherRequest{
+    string name =1;
+    string location=2;
+}
+
+message PublisherEntity{
+    int32 publisher_id = 1;
+    string name =2;
+    string location = 3;
+
+}
+
+message GetAllPublisherRequest{
+
+}
+
+message Empty{}
+
