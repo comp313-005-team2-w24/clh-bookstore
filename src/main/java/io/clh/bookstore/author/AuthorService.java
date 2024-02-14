@@ -38,16 +38,25 @@ public class AuthorService implements IAuthor {
         return author;
     }
 
-    @Override
-    public List<Author> getAllAuthors() {
-        Session session = sessionFactory.openSession();
-        List<Author> authors = session.createQuery("from Author", Author.class).list();
-        session.close();
-        return authors;
-    }
 
     @Override
-    public Author setUrlAvatar(String url, Integer id) throws IllegalAccessException {
+    public List<Author> getAllAuthors(int page) {
+        final int pageSize = 50;
+        try (Session session = sessionFactory.openSession()) {
+            int firstResult = (page - 1) * pageSize;
+
+            return session.createQuery("from Author", Author.class)
+                    .setFirstResult(firstResult)
+                    .setMaxResults(pageSize)
+                    .list();
+        } catch (RuntimeException e) {
+            throw e;
+        }
+    }
+
+
+    @Override
+    public Author setUrlAvatar(String url, Integer id) {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
