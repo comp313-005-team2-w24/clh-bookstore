@@ -2,6 +2,7 @@ package io.clh.config;
 
 import io.clh.models.Author;
 import io.clh.models.Book;
+import io.clh.models.Category;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
@@ -38,6 +39,7 @@ public class HibernateConfigUtil {
         // Add annotated classes
         configuration.addAnnotatedClass(Author.class);
         configuration.addAnnotatedClass(Book.class);
+        configuration.addAnnotatedClass(Category.class);
         configuration.setImplicitNamingStrategy(new org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl());
 
         return configuration.buildSessionFactory();
