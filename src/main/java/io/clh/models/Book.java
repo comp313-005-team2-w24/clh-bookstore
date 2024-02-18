@@ -3,14 +3,16 @@ package io.clh.models;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @RequiredArgsConstructor()
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-@Data
+@Getter
+@Setter
 @Table(name = "books")
-@ToString
+@ToString(exclude = "authors") // it causes issues with lazy loading
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

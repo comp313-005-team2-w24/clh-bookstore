@@ -1,10 +1,7 @@
 package io.clh.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -12,8 +9,10 @@ import java.util.Set;
 @Entity
 @RequiredArgsConstructor()
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-@Data
+@Getter
+@Setter
 @Table(name = "authors")
+@ToString(exclude = "books") // it causes issues with lazy loading
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
