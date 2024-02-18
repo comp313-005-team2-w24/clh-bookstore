@@ -12,4 +12,6 @@ public interface IBook {
 
     Book getBookById(int bookId);
     Set<Book> findBooksByAuthorId(int authorId);
+
+    Book deleteBookById(int bookId);
 }

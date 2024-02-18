@@ -89,4 +89,21 @@ public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
         }
     }
 
+    @Override
+    public void deleteBook(BookOuterClass.DeleteBookRequest request, StreamObserver<BookOuterClass.DeleteBookResponse> responseObserver) {
+        try {
+            long bookId = request.getBook().getBookId();
+            Book book = bookService.deleteBookById((int) bookId);
+            if (book != null) {
+                BookOuterClass.Book responseBook = convertToBookOuterBookProto(book);
+                BookOuterClass.DeleteBookResponse response = BookOuterClass.DeleteBookResponse.newBuilder().setBook(responseBook).build();
+                responseObserver.onNext(response);
+            } else {
+                responseObserver.onError(new Throwable("Book not able to delete with ID: " + bookId));
+            }
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
 }
