@@ -157,4 +157,27 @@ public class BookServiceHibernateTest {
 
         Assertions.assertEquals("Updated Test Book Title", updatedBook.getTitle());
     }
+
+    @Test
+    @Order(4)
+    public void deleteBook(){
+        BookService bookService = new BookService(sessionFactory, new AuthorService(sessionFactory));
+        Transaction tx = session.beginTransaction();
+        Book bookToDelete = bookService.deleteBookById(1);
+        tx.commit();
+
+        Assertions.assertTrue(bookToDelete.getBook_id() > 0);
+    }
+
+    @Test
+    @Order(5)
+    public void BookHasBeenRemoved() {
+        BookService bookService = new BookService(sessionFactory, new AuthorService(sessionFactory));
+
+        Transaction tx = session.beginTransaction();
+        Book removedBook = bookService.getBookById(1);
+        tx.commit();
+
+        Assertions.assertNull(removedBook);
+    }
 }

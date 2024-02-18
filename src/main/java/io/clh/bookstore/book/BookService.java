@@ -6,13 +6,13 @@ import io.clh.models.Book;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.type.StandardBasicTypes;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
-import java.sql.Date;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class BookService implements IBook {
     private final SessionFactory sessionFactory;
@@ -72,6 +72,27 @@ public class BookService implements IBook {
             return new HashSet<>(session.createQuery(cq).getResultList());
         }
     }
+
+    @Override
+    public Book deleteBookById(int bookId) {
+        Transaction transaction = null;
+        Book bookById = getBookById(bookId);
+
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+
+            if (bookById != null) {
+                session.delete(bookById);
+            }
+
+            transaction.commit();
+            return bookById;
+        } catch (RuntimeException e) {
+            if (transaction != null) transaction.rollback();
+            throw e;
+        }
+    }
+
 
     @Override
     public Book updateBook(Book book) {
