@@ -13,7 +13,6 @@ import java.util.Set;
 @Table(name = "categories")
 @ToString(exclude = "books")
 public class Category {
-
     @Id
     private Long id;
 
@@ -23,6 +22,6 @@ public class Category {
     @Column(name = "description")
     private String description;
 
-    @OneToMany
+    @OneToMany(mappedBy = "category", fetch = FetchType.EAGER)
     private Set<Book> books;
 }

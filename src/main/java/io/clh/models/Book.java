@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "books")
-@ToString(exclude = "authors") // it causes issues with lazy loading
+@ToString(exclude = {"authors", "category"})
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +40,10 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
     private Set<Author> authors;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @Override
     public boolean equals(Object o) {

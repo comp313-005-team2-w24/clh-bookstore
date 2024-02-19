@@ -2,6 +2,7 @@ package io.clh.bookstore.author;
 
 import io.clh.models.Author;
 import io.clh.models.Book;
+import io.clh.models.Category;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -10,6 +11,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -30,7 +36,7 @@ public class AuthorServiceHibernateTest {
             new PostgreSQLContainer<>("postgres:latest").withDatabaseName("testdb").withUsername("test").withPassword("test");
 
     @BeforeAll
-    public static void setUp() {
+    public static void setUp() throws IOException, URISyntaxException {
         postgresqlContainer.start();
 
         Configuration configuration = new Configuration();
@@ -40,45 +46,18 @@ public class AuthorServiceHibernateTest {
         configuration.setImplicitNamingStrategy(new org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl());
         configuration.addAnnotatedClass(Author.class);
         configuration.addAnnotatedClass(Book.class);
+        configuration.addAnnotatedClass(Category.class);
 
         sessionFactory = configuration.buildSessionFactory();
         session = sessionFactory.openSession();
 
-        try (Connection conn = DriverManager.getConnection(
-                postgresqlContainer.getJdbcUrl(),
-                postgresqlContainer.getUsername(),
-                postgresqlContainer.getPassword()
-        ); Statement stmt = conn.createStatement()) {
-            stmt.execute("CREATE TABLE authors (" +
-                    "    author_id SERIAL PRIMARY KEY," +
-                    "    name VARCHAR(100)," +
-                    "    avatar_url VARCHAR(255)," +
-                    "    biography TEXT" +
-                    ");");
-
-            stmt.execute("CREATE TABLE books (" +
-                    "    book_id SERIAL PRIMARY KEY," +
-                    "    title VARCHAR(255)," +
-                    "    description TEXT," +
-                    "    isbn VARCHAR(20)," +
-                    "    publication_date DATE," +
-                    "    price DECIMAL(10, 2)," +
-                    "    stock_quantity INT," +
-                    "    avatar_url VARCHAR(255)," +
-                    "    category_id INT" +
-                    ");");
-
-            stmt.execute("CREATE TABLE book_authors (" +
-                    "    book_id INT NOT NULL," +
-                    "    author_id INT NOT NULL," +
-                    "    PRIMARY KEY (book_id, author_id)," +
-                    "    FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE," +
-                    "    FOREIGN KEY (author_id) REFERENCES authors(author_id) ON DELETE CASCADE" +
-                    ");");
-
-            //    stmt.execute("CREATE TABLE orders (" + "    order_id SERIAL PRIMARY KEY," + "    book_id INT REFERENCES books(book_id)," + "    quantity INT," + "    order_date DATE," + "    total_price DECIMAL(10, 2)," + "    delivery_status VARCHAR(50)" + ");");
-            //    stmt.execute("CREATE TABLE reviews (" + "    review_id SERIAL PRIMARY KEY," + "    book_id INT REFERENCES books(book_id)," + "    rating INT," + "    comment TEXT," + "    review_date DATE" + ");");
-            //    stmt.execute("CREATE TABLE categories (" + "    category_id SERIAL PRIMARY KEY," + "    name VARCHAR(100)," + "    description TEXT" + ");");
+        Path path = Paths.get(ClassLoader.getSystemResource("setup.sql").toURI());
+        String sql = new String(Files.readAllBytes(path));
+        try (Connection conn = DriverManager.getConnection(postgresqlContainer.getJdbcUrl(), postgresqlContainer.getUsername(), postgresqlContainer.getPassword()); Statement stmt = conn.createStatement()) {
+            String[] statements = sql.split(";");
+            for (String statement : statements) {
+                stmt.execute(statement.trim());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to initialize database schema", e);

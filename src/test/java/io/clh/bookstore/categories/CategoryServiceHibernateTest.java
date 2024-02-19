@@ -1,5 +1,7 @@
 package io.clh.bookstore.categories;
 
+import io.clh.bookstore.author.AuthorService;
+import io.clh.bookstore.book.BookService;
 import io.clh.models.Author;
 import io.clh.models.Book;
 import io.clh.models.Category;
@@ -7,13 +9,18 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.junit.Assert;
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.List;
@@ -27,11 +34,10 @@ public class CategoryServiceHibernateTest {
     private static Session session;
 
     @Container
-    private static final PostgreSQLContainer<?> postgresqlContainer =
-            new PostgreSQLContainer<>("postgres:latest").withDatabaseName("testdb").withUsername("test").withPassword("test");
+    private static final PostgreSQLContainer<?> postgresqlContainer = new PostgreSQLContainer<>("postgres:latest").withDatabaseName("testdb").withUsername("test").withPassword("test");
 
     @BeforeAll
-    public static void setUp() {
+    public static void setUp() throws IOException, URISyntaxException {
         postgresqlContainer.start();
 
         Configuration configuration = new Configuration();
@@ -46,60 +52,13 @@ public class CategoryServiceHibernateTest {
         sessionFactory = configuration.buildSessionFactory();
         session = sessionFactory.openSession();
 
-        try (Connection conn = DriverManager.getConnection(
-                postgresqlContainer.getJdbcUrl(),
-                postgresqlContainer.getUsername(),
-                postgresqlContainer.getPassword()
-        ); Statement stmt = conn.createStatement()) {
-            stmt.execute("CREATE TABLE authors (" +
-                    "    author_id SERIAL PRIMARY KEY," +
-                    "    name VARCHAR(100)," +
-                    "    avatar_url VARCHAR(255)," +
-                    "    biography TEXT" +
-                    ");");
-
-            stmt.execute("CREATE TABLE books (" +
-                    "    book_id SERIAL PRIMARY KEY," +
-                    "    title VARCHAR(255)," +
-                    "    description TEXT," +
-                    "    isbn VARCHAR(20)," +
-                    "    publication_date DATE," +
-                    "    price DECIMAL(10, 2)," +
-                    "    stock_quantity INT," +
-                    "    avatar_url VARCHAR(255)," +
-                    "    category_id INT" +
-                    ");");
-
-            stmt.execute("CREATE TABLE book_authors (" +
-                    "    book_id INT NOT NULL," +
-                    "    author_id INT NOT NULL," +
-                    "    PRIMARY KEY (book_id, author_id)," +
-                    "    FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE," +
-                    "    FOREIGN KEY (author_id) REFERENCES authors(author_id) ON DELETE CASCADE" +
-                    ");");
-
-
-            stmt.execute("create table categories\n" +
-                    "(\n" +
-                    "    id          bigint not null\n" +
-                    "        primary key,\n" +
-                    "    description varchar(255),\n" +
-                    "    name        varchar(255)\n" +
-                    ");");
-
-            stmt.execute("create table categories_books\n" +
-                    "(\n" +
-                    "    category_id   bigint  not null\n" +
-                    "        constraint fk3i5qlw63appsdgy6qtp0pqk83\n" +
-                    "            references categories,\n" +
-                    "    books_book_id integer not null\n" +
-                    "        constraint uk_rtsclxyko9ppqks6acta4i84t\n" +
-                    "            unique\n" +
-                    "        constraint fkbdd1ei67142eh1gh84dhhvw17\n" +
-                    "            references books,\n" +
-                    "    primary key (category_id, books_book_id)\n" +
-                    ");");
-
+        Path path = Paths.get(ClassLoader.getSystemResource("setup.sql").toURI());
+        String sql = new String(Files.readAllBytes(path));
+        try (Connection conn = DriverManager.getConnection(postgresqlContainer.getJdbcUrl(), postgresqlContainer.getUsername(), postgresqlContainer.getPassword()); Statement stmt = conn.createStatement()) {
+            String[] statements = sql.split(";");
+            for (String statement : statements) {
+                stmt.execute(statement.trim());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to initialize database schema", e);
@@ -151,6 +110,65 @@ public class CategoryServiceHibernateTest {
 
         Assertions.assertFalse(categories.isEmpty());
         Assertions.assertEquals(allCategories.get(), 1);
+    }
+
+    @Test()
+    @Order(3)
+    public void UpdateCategory() {
+        CategoryService categoryService = new CategoryService(sessionFactory);
+        AuthorService authorService = new AuthorService(sessionFactory);
+        BookService bookService = new BookService(sessionFactory, authorService);
+
+        Author author = new Author();
+        author.setName("Author Name".toCharArray());
+        author.setBiography("A brief bio");
+        author.setAvatar_url("http://example.com/avatar.jpg");
+
+        Transaction tx = session.beginTransaction();
+        authorService.addAuthor(author);
+        tx.commit();
+
+
+        Book book = new Book();
+        book.setTitle("Test Book");
+        book.setDescription("A test book description");
+        book.setIsbn("1234567890");
+        book.setPrice(19.99);
+        book.setStockQuantity(100);
+        book.setAvatar_url("http://example.com/image.png");
+        book.setPublicationDate(new Date(System.currentTimeMillis()));
+        book.setAuthors(Set.of(author));
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Novel");
+        category.setDescription("Test");
+        category.setBooks(Set.of(book));
+
+        book.setCategory(category);
+
+        tx = session.beginTransaction();
+        bookService.createBook(book);
+        tx.commit();
+
+
+        Category updateCategory = categoryService.UpdateCategory(category);
+        Set<Book> books = updateCategory.getBooks();
+
+        List<Book> bookList = books.stream().toList();
+
+        Assertions.assertTrue(!bookList.isEmpty());
+        Assertions.assertEquals(bookList.size(), 1);
+    }
+
+    @Test
+    @Order(4)
+    public void GetAllBooksByCategory() {
+        CategoryService categoryService = new CategoryService(sessionFactory);
+        List<Book> books = categoryService.GetAllBooksByCategory(1);
+
+        Assertions.assertFalse(books.isEmpty(), "Books list should not be empty");
+        Assertions.assertEquals(books.get(0).getTitle(), "Test Book");
     }
 
 }
