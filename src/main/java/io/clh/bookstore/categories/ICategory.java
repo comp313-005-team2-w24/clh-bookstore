@@ -11,4 +11,5 @@ public interface ICategory {
     Category DeleteCategory (Integer categoryId);
     List<Category> GetAllCategories ();
     Category UpdateCategory (Category category);
+    Category GetCategoryById(Long categoryId);
 }

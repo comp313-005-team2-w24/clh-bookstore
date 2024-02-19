@@ -171,4 +171,25 @@ public class CategoryServiceHibernateTest {
         Assertions.assertEquals(books.get(0).getTitle(), "Test Book");
     }
 
+    @Test
+    @Order(5)
+    public void GetCategoryById() {
+        CategoryService categoryService = new CategoryService(sessionFactory);
+
+        Category category = categoryService.GetCategoryById(1L);
+
+        Assertions.assertTrue(category.getId() > 0);
+        Assertions.assertEquals(category.getName(), "Novel");
+    }
+
+    @Test
+    @Order(6)
+    public void DeleteCategoryById() {
+        CategoryService categoryService = new CategoryService(sessionFactory);
+
+        Category category = categoryService.DeleteCategory(1);
+
+        Assertions.assertTrue(category.getId() > 0);
+        Assertions.assertEquals(category.getName(), "Novel");
+    }
 }
