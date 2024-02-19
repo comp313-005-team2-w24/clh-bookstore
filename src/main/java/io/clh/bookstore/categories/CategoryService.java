@@ -19,16 +19,22 @@ public class CategoryService implements ICategory{
     public CategoryService(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
-    
-    @Override
-    public List<Book> GetAllBooksByCategory(Integer id) {
-        return null;
-    }
 
     @Override
-    public Category AddBookToCategory(Integer bookId) {
-        return null;
+    public List<Book> GetAllBooksByCategory(Integer categoryId) {
+        try (Session session = sessionFactory.openSession()) {
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Book> cq = cb.createQuery(Book.class);
+            Root<Book> root = cq.from(Book.class);
+            cq.where(cb.equal(root.get("category").get("id"), categoryId));
+
+            TypedQuery<Book> query = session.createQuery(cq);
+            return query.getResultList();
+        } catch (Exception e) {
+            throw new RuntimeException("Error retrieving books by category", e);
+        }
     }
+
 
     @Override
     public Category AddCategory(Category category) {
@@ -65,6 +71,17 @@ public class CategoryService implements ICategory{
 
     @Override
     public Category UpdateCategory(Category category) {
-        return null;
+        Transaction transaction = null;
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+            session.update(category);
+            transaction.commit();
+            return category;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw e;
+        }
     }
 }

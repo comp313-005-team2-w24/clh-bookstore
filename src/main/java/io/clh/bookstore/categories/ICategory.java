@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface ICategory {
     List<Book> GetAllBooksByCategory (Integer id);
-    Category AddBookToCategory (Integer bookId);
     Category AddCategory (Category category);
     Category DeleteCategory (Integer categoryId);
     List<Category> GetAllCategories ();
