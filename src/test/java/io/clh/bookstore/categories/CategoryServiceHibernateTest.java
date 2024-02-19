@@ -5,11 +5,10 @@ import io.clh.models.Book;
 import io.clh.models.Category;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.Assert;
+import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -17,10 +16,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-
 public class CategoryServiceHibernateTest {
     private static SessionFactory sessionFactory;
     private static Session session;
@@ -77,13 +78,6 @@ public class CategoryServiceHibernateTest {
                     "    FOREIGN KEY (author_id) REFERENCES authors(author_id) ON DELETE CASCADE" +
                     ");");
 
-            stmt.execute("CREATE TABLE book_authors (" +
-                    "    book_id INT NOT NULL," +
-                    "    author_id INT NOT NULL," +
-                    "    PRIMARY KEY (book_id, author_id)," +
-                    "    FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE," +
-                    "    FOREIGN KEY (author_id) REFERENCES authors(author_id) ON DELETE CASCADE" +
-                    ");");
 
             stmt.execute("create table categories\n" +
                     "(\n" +
@@ -122,6 +116,41 @@ public class CategoryServiceHibernateTest {
         }
 
         postgresqlContainer.stop();
+    }
+
+    @Test
+    @Order(1)
+    public void CreateCategory() {
+        CategoryService categoryService = new CategoryService(sessionFactory);
+
+        Set<Book> emptyBooks = Set.of();
+
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Novel");
+        category.setDescription("Test");
+        category.setBooks(emptyBooks);
+
+        Transaction tx = session.beginTransaction();
+        Category addedCategory = categoryService.AddCategory(category);
+        tx.commit();
+
+        Assertions.assertEquals(addedCategory.getId(), 1);
+    }
+
+    @Test
+    @Order(2)
+    public void GetAllCategories() {
+        CategoryService categoryService = new CategoryService(sessionFactory);
+
+        Transaction tx = session.beginTransaction();
+        List<Category> categories = categoryService.GetAllCategories();
+        tx.commit();
+
+        Optional<Long> allCategories = Optional.ofNullable(categories.get(0).getId());
+
+        Assertions.assertFalse(categories.isEmpty());
+        Assertions.assertEquals(allCategories.get(), 1);
     }
 
 }

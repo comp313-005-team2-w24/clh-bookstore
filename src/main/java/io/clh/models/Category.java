@@ -8,9 +8,10 @@ import java.util.Set;
 @Entity
 @RequiredArgsConstructor()
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-@Data
+@Setter
+@Getter
 @Table(name = "categories")
-@ToString
+@ToString(exclude = "books")
 public class Category {
 
     @Id
