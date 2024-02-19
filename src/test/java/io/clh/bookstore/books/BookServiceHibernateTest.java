@@ -17,6 +17,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.util.Set;
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -116,6 +117,7 @@ public class BookServiceHibernateTest {
         book.setStockQuantity(100);
         book.setAvatar_url("http://example.com/image.png");
         book.setPublicationDate(new Date(System.currentTimeMillis()));
+        book.setAuthors(Set.of(author));
 
         tx = session.beginTransaction();
         bookService.createBook(book);
@@ -123,9 +125,8 @@ public class BookServiceHibernateTest {
 
         Book retrievedBook = bookService.getBookById(1);
 
-
-        Assertions.assertTrue(book.getBook_id() > 0);
-        Assertions.assertTrue(author.getAuthor_id() > 0);
+        Assertions.assertTrue(retrievedBook.getBook_id() > 0);
+        Assertions.assertFalse(retrievedBook.getAuthors().isEmpty());
     }
 
 
@@ -160,7 +161,7 @@ public class BookServiceHibernateTest {
 
     @Test
     @Order(4)
-    public void deleteBook(){
+    public void deleteBook() {
         BookService bookService = new BookService(sessionFactory, new AuthorService(sessionFactory));
         Transaction tx = session.beginTransaction();
         Book bookToDelete = bookService.deleteBookById(1);
