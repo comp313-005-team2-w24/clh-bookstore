@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -53,8 +54,28 @@ public class CategoryService implements ICategory{
 
     @Override
     public Category DeleteCategory(Integer categoryId) {
-        return null;
+        Transaction transaction = null;
+        Category categoryById = GetCategoryById(Long.valueOf(categoryId));
+
+        try (Session session = sessionFactory.openSession()) {
+            transaction = session.beginTransaction();
+
+            if (categoryById != null) {
+                categoryById.getBooks().forEach(book -> {
+                    book.setCategory(null);
+                    session.saveOrUpdate(book);
+                });
+                session.delete(categoryById);
+            }
+
+            transaction.commit();
+            return categoryById;
+        } catch (RuntimeException e) {
+            if (transaction != null) transaction.rollback();
+            throw e;
+        }
     }
+
 
     @Override
     public List<Category> GetAllCategories() {
@@ -82,6 +103,18 @@ public class CategoryService implements ICategory{
                 transaction.rollback();
             }
             throw e;
+        }
+    }
+
+    @Override
+    public Category GetCategoryById(Long categoryId) {
+        try (Session session = sessionFactory.openSession()) {
+            String jpql = "SELECT c FROM Category c LEFT JOIN FETCH c.books WHERE c.id = :categoryId";
+            return session.createQuery(jpql, Category.class)
+                    .setParameter("categoryId", categoryId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         }
     }
 }
