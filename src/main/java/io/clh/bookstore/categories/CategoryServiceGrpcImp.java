@@ -1,30 +1,39 @@
 package io.clh.bookstore.categories;
 
 import com.google.protobuf.Empty;
+import io.clh.bookstore.author.AuthorServiceImp;
+import io.clh.bookstore.category.Category;
 import io.clh.bookstore.category.CategoryServiceGrpc;
+import io.clh.bookstore.entities.Entities;
+import io.clh.bookstore.untils.GrpcEntitiesToModels;
 import io.clh.bookstore.untils.ModelsToGrpcEntities;
-import io.clh.models.Book;
 import io.grpc.Status;
+import io.grpc.stub.StreamObserver;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
+import static io.clh.bookstore.untils.ModelsToGrpcEntities.CategoryModelToCategoryGrpc;
 
+@RequiredArgsConstructor
 public class CategoryServiceGrpcImp extends CategoryServiceGrpc.CategoryServiceImplBase {
-
-    private final CategoryService categoryService;
-
-    public CategoryServiceGrpcImp(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
+    private final CategoryServiceImpService categoryServiceImp;
+    private final AuthorServiceImp authorServiceImp;
 
     @Override
-    public void getAllBooksByCategory(CategoryOuterClass.GetAllBooksByCategoryRequest request, StreamObserver<CategoryOuterClass.GetAllBooksByCategoryResponse> responseObserver) {
+    public void getAllBooksByCategory(Category.GetAllBooksByCategoryRequest request, StreamObserver<Entities.Book> responseObserver) {
         try {
-            List<Book> books = categoryService.GetAllBooksByCategory(request.getCategoryId());
+            categoryServiceImp.GetAllBooksByCategory(request.getCategoryId()).stream().map(ModelsToGrpcEntities::BookModelToGrpc).forEach(responseObserver::onNext);
 
-            List<CategoryOuterClass.Book> list = books.stream().map(ModelsToGrpcEntities::convertToCategoryOuterClassBookProto).toList();
-            CategoryOuterClass.GetAllBooksByCategoryResponse response = CategoryOuterClass.GetAllBooksByCategoryResponse.newBuilder().addAllBooks(list).build();
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
 
-            responseObserver.onNext(response);
+
+    @Override
+    public void getAllCategories(Empty request, StreamObserver<Entities.Category> responseObserver) {
+        try {
+            categoryServiceImp.GetAllCategories().stream().map(ModelsToGrpcEntities::CategoryModelToCategoryGrpc).forEach(responseObserver::onNext);
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
@@ -32,27 +41,63 @@ public class CategoryServiceGrpcImp extends CategoryServiceGrpc.CategoryServiceI
     }
 
     @Override
-    public void addCategory(CategoryOuterClass.Category request, StreamObserver<CategoryOuterClass.Category> responseObserver) {
-        super.addCategory(request, responseObserver);
+    public void addCategory(Entities.Category request, StreamObserver<Entities.Category> responseObserver) {
+        try {
+            GrpcEntitiesToModels converter = new GrpcEntitiesToModels();
+            io.clh.models.Category category = converter.CategoryGrpcToCategoryModel(request, authorServiceImp);
+            io.clh.models.Category createdCategory = categoryServiceImp.AddCategory(category);
+            Entities.Category grpc = CategoryModelToCategoryGrpc(createdCategory);
+
+            responseObserver.onNext(grpc);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
     }
 
-    @Override
-    public void deleteCategory(CategoryOuterClass.DeleteCategoryRequest request, StreamObserver<CategoryOuterClass.Category> responseObserver) {
-        super.deleteCategory(request, responseObserver);
-    }
 
     @Override
-    public void getAllCategories(Empty request, StreamObserver<CategoryOuterClass.GetAllCategoriesResponse> responseObserver) {
-        super.getAllCategories(request, responseObserver);
+    public void deleteCategory(Category.DeleteCategoryRequest request, StreamObserver<Entities.Category> responseObserver) {
+        try {
+            io.clh.models.Category deletedCategory = categoryServiceImp.DeleteCategory(request.getCategoryId());
+            Entities.Category grpc = CategoryModelToCategoryGrpc(deletedCategory);
+
+            responseObserver.onNext(grpc);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
     }
 
-    @Override
-    public void updateCategory(CategoryOuterClass.Category request, StreamObserver<CategoryOuterClass.Category> responseObserver) {
-        super.updateCategory(request, responseObserver);
-    }
 
     @Override
-    public void getCategoryById(CategoryOuterClass.GetCategoryByIdRequest request, StreamObserver<CategoryOuterClass.Category> responseObserver) {
-        super.getCategoryById(request, responseObserver);
+    public void updateCategory(Entities.Category request, StreamObserver<Entities.Category> responseObserver) {
+        try {
+            GrpcEntitiesToModels converter = new GrpcEntitiesToModels();
+            io.clh.models.Category category = converter.CategoryGrpcToCategoryModel(request, authorServiceImp);
+
+            io.clh.models.Category updatedCategory = categoryServiceImp.UpdateCategory(category);
+            Entities.Category grpc = CategoryModelToCategoryGrpc(updatedCategory);
+
+            responseObserver.onNext(grpc);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
     }
+
+
+    @Override
+    public void getCategoryById(Category.GetCategoryByIdRequest request, StreamObserver<Entities.Category> responseObserver) {
+        try {
+            io.clh.models.Category updatedCategory = categoryServiceImp.GetCategoryById(request.getCategoryId());
+            Entities.Category grpc = CategoryModelToCategoryGrpc(updatedCategory);
+
+            responseObserver.onNext(grpc);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
+
 }

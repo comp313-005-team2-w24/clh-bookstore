@@ -123,7 +123,7 @@ public class AuthorServiceImpHibernateTest {
     @Order(3)
     public void setAuthorImageUrlAvatar() {
         AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
-        Author author = authorServiceImp.setUrlAvatar("https://0.gravatar.com/avatar/1b4e9e532c9fbb9e7eec83c0a2cb8884bfb996017696c7a419c0ec92b870a35b?size=256", 1);
+        Author author = authorServiceImp.setUrlAvatar("https://0.gravatar.com/avatar/1b4e9e532c9fbb9e7eec83c0a2cb8884bfb996017696c7a419c0ec92b870a35b?size=256", 1L);
 
         Assertions.assertNotNull(author);
     }

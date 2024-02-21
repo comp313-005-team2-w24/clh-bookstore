@@ -12,6 +12,7 @@ import java.util.Set;
 @Getter
 @Table(name = "categories")
 @ToString(exclude = "books")
+@Builder
 public class Category {
     @Id
     private Long id;

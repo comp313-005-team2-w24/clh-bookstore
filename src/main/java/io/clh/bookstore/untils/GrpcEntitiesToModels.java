@@ -5,9 +5,11 @@ import io.clh.bookstore.author.AuthorService;
 import io.clh.bookstore.entities.Entities;
 import io.clh.models.Author;
 import io.clh.models.Book;
+import io.clh.models.Category;
 
 import java.sql.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class GrpcEntitiesToModels {
@@ -46,6 +48,18 @@ public class GrpcEntitiesToModels {
                 .avatar_url(bookProto.getAvatarUrl())
                 .publicationDate(date)
                 .authors(authors)
+                .build();
+    }
+
+    public Category CategoryGrpcToCategoryModel(Entities.Category category, AuthorService authorService) {
+        GrpcEntitiesToModels converter = new GrpcEntitiesToModels();
+        List<Book> list = category.getBooksList().stream().map(book -> converter.convertFromBookProto(book, authorService)).toList();
+
+        return Category.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .description(category.getDescription())
+                .books(Set.of((Book) list))
                 .build();
     }
 }
