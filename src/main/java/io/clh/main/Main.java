@@ -1,11 +1,11 @@
 package io.clh.main;
 
-import io.clh.bookstore.author.AuthorServiceImp;
 import io.clh.bookstore.author.AuthorServiceGrpcImp;
-import io.clh.bookstore.book.BookServiceImpService;
+import io.clh.bookstore.author.AuthorServiceImp;
 import io.clh.bookstore.book.BookServiceGrpcImp;
-import io.clh.bookstore.categories.CategoryServiceImpService;
+import io.clh.bookstore.book.BookServiceImpService;
 import io.clh.bookstore.categories.CategoryServiceGrpcImp;
+import io.clh.bookstore.categories.CategoryServiceImpService;
 import io.clh.config.HibernateConfigUtil;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
