@@ -3,7 +3,7 @@ package io.clh.bookstore.categories;
 import com.google.protobuf.Empty;
 import io.clh.bookstore.category.CategoryOuterClass;
 import io.clh.bookstore.category.CategoryServiceGrpc;
-import io.clh.bookstore.untils.DtoProtoConversions;
+import io.clh.bookstore.untils.ModelsToGrpcEntities;
 import io.clh.models.Book;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -23,7 +23,7 @@ public class CategoryServiceGrpcImp extends CategoryServiceGrpc.CategoryServiceI
         try {
             List<Book> books = categoryService.GetAllBooksByCategory(request.getCategoryId());
 
-            List<CategoryOuterClass.Book> list = books.stream().map(DtoProtoConversions::convertToCategoryOuterClassBookProto).toList();
+            List<CategoryOuterClass.Book> list = books.stream().map(ModelsToGrpcEntities::convertToCategoryOuterClassBookProto).toList();
             CategoryOuterClass.GetAllBooksByCategoryResponse response = CategoryOuterClass.GetAllBooksByCategoryResponse.newBuilder().addAllBooks(list).build();
 
             responseObserver.onNext(response);

@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class AuthorServiceHibernateTest {
+public class AuthorServiceImpHibernateTest {
     private static SessionFactory sessionFactory;
     private static Session session;
 
@@ -79,7 +79,7 @@ public class AuthorServiceHibernateTest {
     @Test
     @Order(1)
     public void createAuthor() {
-        AuthorService authorService = new AuthorService(sessionFactory);
+        AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
         Book book = new Book();
 
         Set<Book> emptySet = Set.of();
@@ -90,8 +90,8 @@ public class AuthorServiceHibernateTest {
         );
 
         session.beginTransaction();
-        authorService.addAuthor(author);
-        Author retrievedAuthor = authorService.getAuthorById(author.getAuthor_id());
+        authorServiceImp.addAuthor(author);
+        Author retrievedAuthor = authorServiceImp.getAuthorById(author.getAuthor_id());
         session.getTransaction().commit();
 
         Assertions.assertNotNull(retrievedAuthor);
@@ -103,8 +103,8 @@ public class AuthorServiceHibernateTest {
     @Test
     @Order(2)
     public void getAuthorByIdShouldNotBeEmpty() {
-        AuthorService authorService = new AuthorService(sessionFactory);
-        Author authorById1 = authorService.getAuthorById(1);
+        AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
+        Author authorById1 = authorServiceImp.getAuthorById(1);
 
         Assertions.assertTrue(authorById1.getName().length > 0);
     }
@@ -113,8 +113,8 @@ public class AuthorServiceHibernateTest {
     @Test
     @Order(2)
     public void getAllAuthorsShouldNotBeEmpty() {
-        AuthorService authorService = new AuthorService(sessionFactory);
-        List<Author> authors = authorService.getAllAuthors(1);
+        AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
+        List<Author> authors = authorServiceImp.getAllAuthors(1);
 
         assertFalse(authors.isEmpty(), "The list of authors should not be empty");
     }
@@ -122,8 +122,8 @@ public class AuthorServiceHibernateTest {
     @Test
     @Order(3)
     public void setAuthorImageUrlAvatar() {
-        AuthorService authorService = new AuthorService(sessionFactory);
-        Author author = authorService.setUrlAvatar("https://0.gravatar.com/avatar/1b4e9e532c9fbb9e7eec83c0a2cb8884bfb996017696c7a419c0ec92b870a35b?size=256", 1);
+        AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
+        Author author = authorServiceImp.setUrlAvatar("https://0.gravatar.com/avatar/1b4e9e532c9fbb9e7eec83c0a2cb8884bfb996017696c7a419c0ec92b870a35b?size=256", 1);
 
         Assertions.assertNotNull(author);
     }

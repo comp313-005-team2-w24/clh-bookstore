@@ -1,13 +1,12 @@
 package io.clh.main;
 
-import io.clh.bookstore.author.AuthorService;
+import io.clh.bookstore.author.AuthorServiceImp;
 import io.clh.bookstore.author.AuthorServiceGrpcImp;
 import io.clh.bookstore.book.BookService;
 import io.clh.bookstore.book.BookServiceGrpcImp;
 import io.clh.bookstore.categories.CategoryService;
 import io.clh.bookstore.categories.CategoryServiceGrpcImp;
 import io.clh.config.HibernateConfigUtil;
-import io.clh.models.Category;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.prometheus.client.exporter.HTTPServer;
@@ -29,15 +28,15 @@ public class Main {
          */
         SessionFactory sessionFactory = HibernateConfigUtil.createSessionFactory();
 
-        AuthorService authorService = new AuthorService(sessionFactory);
-        BookService bookService = new BookService(sessionFactory, authorService);
+        AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
+        BookService bookService = new BookService(sessionFactory, authorServiceImp);
         CategoryService categoryService = new CategoryService(sessionFactory );
 
         /*
          * gRPC server. use addService() to add new services (e.g. CRUD operations)
          */
-        AuthorServiceGrpcImp authorServiceGrpcImp = new AuthorServiceGrpcImp(authorService, bookService);
-        BookServiceGrpcImp bookServiceGrpcImp = new BookServiceGrpcImp(bookService, authorService);
+        AuthorServiceGrpcImp authorServiceGrpcImp = new AuthorServiceGrpcImp(authorServiceImp, bookService);
+        BookServiceGrpcImp bookServiceGrpcImp = new BookServiceGrpcImp(bookService, authorServiceImp);
         CategoryServiceGrpcImp categoryServiceGrpcImp = new CategoryServiceGrpcImp(categoryService);
 
         Server server = ServerBuilder.forPort(GRPC_SERVER_PORT).addService(authorServiceGrpcImp).addService(bookServiceGrpcImp).build();

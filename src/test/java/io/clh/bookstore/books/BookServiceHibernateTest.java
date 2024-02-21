@@ -1,6 +1,6 @@
 package io.clh.bookstore.books;
 
-import io.clh.bookstore.author.AuthorService;
+import io.clh.bookstore.author.AuthorServiceImp;
 import io.clh.bookstore.book.BookService;
 import io.clh.models.Author;
 import io.clh.models.Book;
@@ -80,8 +80,8 @@ public class BookServiceHibernateTest {
     @Test
     @Order(1)
     public void createBook() {
-        AuthorService authorService = new AuthorService(sessionFactory);
-        BookService bookService = new BookService(sessionFactory, authorService);
+        AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
+        BookService bookService = new BookService(sessionFactory, authorServiceImp);
 
         Author author = new Author();
         author.setName("Author Name".toCharArray());
@@ -89,7 +89,7 @@ public class BookServiceHibernateTest {
         author.setAvatar_url("http://example.com/avatar.jpg");
 
         Transaction tx = session.beginTransaction();
-        authorService.addAuthor(author);
+        authorServiceImp.addAuthor(author);
         tx.commit();
 
         Book book = new Book();
@@ -116,8 +116,8 @@ public class BookServiceHibernateTest {
     @Test
     @Order(2)
     public void GetBookByIdNotEmpty() {
-        AuthorService authorService = new AuthorService(sessionFactory);
-        BookService bookService = new BookService(sessionFactory, authorService);
+        AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
+        BookService bookService = new BookService(sessionFactory, authorServiceImp);
 
         Transaction tx = session.beginTransaction();
         Book retrievedBook = bookService.getBookById(1);
@@ -129,7 +129,7 @@ public class BookServiceHibernateTest {
     @Test
     @Order(3)
     public void updateBook() {
-        BookService bookService = new BookService(sessionFactory, new AuthorService(sessionFactory));
+        BookService bookService = new BookService(sessionFactory, new AuthorServiceImp(sessionFactory));
 
         Transaction tx = session.beginTransaction();
         Book bookToUpdate = bookService.getBookById(1);
@@ -145,7 +145,7 @@ public class BookServiceHibernateTest {
     @Test
     @Order(4)
     public void deleteBook() {
-        BookService bookService = new BookService(sessionFactory, new AuthorService(sessionFactory));
+        BookService bookService = new BookService(sessionFactory, new AuthorServiceImp(sessionFactory));
         Transaction tx = session.beginTransaction();
         Book bookToDelete = bookService.deleteBookById(1);
         tx.commit();
@@ -156,7 +156,7 @@ public class BookServiceHibernateTest {
     @Test
     @Order(5)
     public void BookHasBeenRemoved() {
-        BookService bookService = new BookService(sessionFactory, new AuthorService(sessionFactory));
+        BookService bookService = new BookService(sessionFactory, new AuthorServiceImp(sessionFactory));
 
         Transaction tx = session.beginTransaction();
         Book removedBook = bookService.getBookById(1);

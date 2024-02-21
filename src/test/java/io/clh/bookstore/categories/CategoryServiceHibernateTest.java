@@ -1,6 +1,6 @@
 package io.clh.bookstore.categories;
 
-import io.clh.bookstore.author.AuthorService;
+import io.clh.bookstore.author.AuthorServiceImp;
 import io.clh.bookstore.book.BookService;
 import io.clh.models.Author;
 import io.clh.models.Book;
@@ -116,8 +116,8 @@ public class CategoryServiceHibernateTest {
     @Order(3)
     public void UpdateCategory() {
         CategoryService categoryService = new CategoryService(sessionFactory);
-        AuthorService authorService = new AuthorService(sessionFactory);
-        BookService bookService = new BookService(sessionFactory, authorService);
+        AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
+        BookService bookService = new BookService(sessionFactory, authorServiceImp);
 
         Author author = new Author();
         author.setName("Author Name".toCharArray());
@@ -125,7 +125,7 @@ public class CategoryServiceHibernateTest {
         author.setAvatar_url("http://example.com/avatar.jpg");
 
         Transaction tx = session.beginTransaction();
-        authorService.addAuthor(author);
+        authorServiceImp.addAuthor(author);
         tx.commit();
 
         Book book = new Book();

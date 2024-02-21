@@ -1,6 +1,6 @@
 package io.clh.bookstore.book;
 
-import io.clh.bookstore.author.AuthorService;
+import io.clh.bookstore.author.AuthorServiceImp;
 import io.clh.models.Author;
 import io.clh.models.Book;
 import org.hibernate.Session;
@@ -16,12 +16,12 @@ import java.util.Set;
 
 public class BookService implements IBook {
     private final SessionFactory sessionFactory;
-    private final AuthorService authorService;
+    private final AuthorServiceImp authorServiceImp;
 
-    public BookService(SessionFactory sessionFactory, AuthorService authorService) {
+    public BookService(SessionFactory sessionFactory, AuthorServiceImp authorServiceImp) {
         this.sessionFactory = sessionFactory;
 
-        this.authorService = authorService;
+        this.authorServiceImp = authorServiceImp;
     }
 
     @Override

@@ -13,10 +13,11 @@ import java.util.Set;
 @Setter
 @Table(name = "authors")
 @ToString(exclude = "books") // it causes issues with lazy loading
+@Builder
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int author_id;
+    private Long author_id;
 
     private char[] name;
     private String biography;
