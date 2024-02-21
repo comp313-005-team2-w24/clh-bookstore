@@ -9,10 +9,9 @@ create table authors
 
 create table categories
 (
-    id          bigint not null
-        primary key,
+    category_id serial primary key,
     description varchar(255),
-    name        varchar(255)
+    name varchar(255)
 );
 
 create table books
@@ -40,17 +39,4 @@ create table book_authors
         constraint fko86065vktj3hy1m7syr9cn7va
             references authors,
     primary key (book_id, author_id)
-);
-
-create table categories_books
-(
-    category_id   bigint  not null
-        constraint fk3i5qlw63appsdgy6qtp0pqk83
-            references categories,
-    books_book_id integer not null
-        constraint uk_rtsclxyko9ppqks6acta4i84t
-            unique
-        constraint fkbdd1ei67142eh1gh84dhhvw17
-            references books,
-    primary key (category_id, books_book_id)
 );

@@ -2,6 +2,7 @@ package io.clh.bookstore.categories;
 
 import com.google.protobuf.Empty;
 import io.clh.bookstore.author.AuthorServiceImp;
+import io.clh.bookstore.book.BookServiceImpService;
 import io.clh.bookstore.category.Category;
 import io.clh.bookstore.category.CategoryServiceGrpc;
 import io.clh.bookstore.entities.Entities;
@@ -17,6 +18,7 @@ import static io.clh.bookstore.untils.ModelsToGrpcEntities.CategoryModelToCatego
 public class CategoryServiceGrpcImp extends CategoryServiceGrpc.CategoryServiceImplBase {
     private final CategoryServiceImpService categoryServiceImp;
     private final AuthorServiceImp authorServiceImp;
+    private final BookServiceImpService bookServiceImp;
 
     @Override
     public void getAllBooksByCategory(Category.GetAllBooksByCategoryRequest request, StreamObserver<Entities.Book> responseObserver) {
@@ -44,7 +46,7 @@ public class CategoryServiceGrpcImp extends CategoryServiceGrpc.CategoryServiceI
     public void addCategory(Entities.Category request, StreamObserver<Entities.Category> responseObserver) {
         try {
             GrpcEntitiesToModels converter = new GrpcEntitiesToModels();
-            io.clh.models.Category category = converter.CategoryGrpcToCategoryModel(request, authorServiceImp);
+            io.clh.models.Category category = converter.CategoryGrpcToCategoryModel(request, authorServiceImp, bookServiceImp);
             io.clh.models.Category createdCategory = categoryServiceImp.AddCategory(category);
             Entities.Category grpc = CategoryModelToCategoryGrpc(createdCategory);
 
@@ -74,7 +76,7 @@ public class CategoryServiceGrpcImp extends CategoryServiceGrpc.CategoryServiceI
     public void updateCategory(Entities.Category request, StreamObserver<Entities.Category> responseObserver) {
         try {
             GrpcEntitiesToModels converter = new GrpcEntitiesToModels();
-            io.clh.models.Category category = converter.CategoryGrpcToCategoryModel(request, authorServiceImp);
+            io.clh.models.Category category = converter.CategoryGrpcToCategoryModel(request, authorServiceImp, bookServiceImp);
 
             io.clh.models.Category updatedCategory = categoryServiceImp.UpdateCategory(category);
             Entities.Category grpc = CategoryModelToCategoryGrpc(updatedCategory);

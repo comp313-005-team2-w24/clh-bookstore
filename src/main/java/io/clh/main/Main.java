@@ -37,9 +37,13 @@ public class Main {
          */
         AuthorServiceGrpcImp authorServiceGrpcImp = new AuthorServiceGrpcImp(authorServiceImp, bookServiceImp);
         BookServiceGrpcImp bookServiceGrpcImp = new BookServiceGrpcImp(bookServiceImp, authorServiceImp);
-        CategoryServiceGrpcImp categoryServiceGrpcImp = new CategoryServiceGrpcImp(categoryServiceImp, authorServiceImp);
+        CategoryServiceGrpcImp categoryServiceGrpcImp = new CategoryServiceGrpcImp(categoryServiceImp, authorServiceImp, bookServiceImp);
 
-        Server server = ServerBuilder.forPort(GRPC_SERVER_PORT).addService(authorServiceGrpcImp).addService(bookServiceGrpcImp).build();
+        Server server = ServerBuilder.forPort(GRPC_SERVER_PORT)
+                .addService(authorServiceGrpcImp)
+                .addService(bookServiceGrpcImp)
+                .addService(categoryServiceGrpcImp)
+                .build();
 
         server.start();
         System.out.printf("Server started on port %s", GRPC_SERVER_PORT);
