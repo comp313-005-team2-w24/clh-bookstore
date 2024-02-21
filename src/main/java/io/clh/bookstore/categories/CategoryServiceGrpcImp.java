@@ -1,12 +1,10 @@
 package io.clh.bookstore.categories;
 
 import com.google.protobuf.Empty;
-import io.clh.bookstore.category.CategoryOuterClass;
 import io.clh.bookstore.category.CategoryServiceGrpc;
 import io.clh.bookstore.untils.ModelsToGrpcEntities;
 import io.clh.models.Book;
 import io.grpc.Status;
-import io.grpc.stub.StreamObserver;
 
 import java.util.List;
 

@@ -7,7 +7,7 @@ import "Entities.proto";
 service BookService {
   rpc CreateBook(CreateBookRequest) returns (CreateBookResponse);
   rpc GetBookById(GetBookByIdRequest) returns (GetBookByIdResponse);
-  rpc GetAllBooks(GetAllBooksRequest) returns (GetAllBooksResponse);
+  rpc GetAllBooks(GetAllBooksRequest) returns (stream Book);
   rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse);
   rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
 }
@@ -42,10 +42,6 @@ message CreateBookResponse {
 
 message GetBookByIdResponse {
   Book book = 1;
-}
-
-message GetAllBooksResponse {
-  repeated Book books = 1;
 }
 
 message UpdateBookResponse {
