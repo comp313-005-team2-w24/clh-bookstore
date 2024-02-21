@@ -2,32 +2,30 @@ package io.clh.bookstore.book;
 
 import io.clh.bookstore.BookOuterClass;
 import io.clh.bookstore.BookServiceGrpc;
-import io.clh.bookstore.author.AuthorService;
-import io.clh.bookstore.untils.DtoProtoConversions;
+import io.clh.bookstore.author.AuthorServiceImp;
+import io.clh.bookstore.untils.ModelsToGrpcEntities;
 import io.clh.models.Book;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static io.clh.bookstore.untils.DtoProtoConversions.convertToBookOuterBookProto;
+import static io.clh.bookstore.untils.ModelsToGrpcEntities.convertToBookOuterBookProto;
 
+@RequiredArgsConstructor
 public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
 
     private final BookService bookService;
-    private final AuthorService authorService;
+    private final AuthorServiceImp authorServiceImp;
 
-    public BookServiceGrpcImp(BookService bookService, AuthorService authorService) {
-        this.bookService = bookService;
-        this.authorService = authorService;
-    }
 
     @Override
     public void createBook(BookOuterClass.CreateBookRequest request, StreamObserver<BookOuterClass.CreateBookResponse> responseObserver) {
         try {
-            DtoProtoConversions dtoProtoConversions = new DtoProtoConversions();
-            Book book = dtoProtoConversions.convertFromBookProto(request.getBook(), authorService);
+            ModelsToGrpcEntities modelsToGrpcEntities = new ModelsToGrpcEntities();
+            Book book = modelsToGrpcEntities.convertFromBookProto(request.getBook(), authorServiceImp);
 
             Book createdBook = bookService.createBook(book);
             BookOuterClass.Book responseBook = convertToBookOuterBookProto(createdBook);
@@ -64,7 +62,7 @@ public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
             int limitPages = request.getPage() == 0 ? 1 : request.getPage();
 
             List<Book> books = bookService.getAllBooks(limitPages);
-            List<BookOuterClass.Book> responseBooks = books.stream().map(DtoProtoConversions::convertToBookOuterBookProto).collect(Collectors.toList());
+            List<BookOuterClass.Book> responseBooks = books.stream().map(ModelsToGrpcEntities::convertToBookOuterBookProto).collect(Collectors.toList());
             BookOuterClass.GetAllBooksResponse response = BookOuterClass.GetAllBooksResponse.newBuilder().addAllBooks(responseBooks).build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
@@ -76,8 +74,8 @@ public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
     @Override
     public void updateBook(BookOuterClass.UpdateBookRequest request, StreamObserver<BookOuterClass.UpdateBookResponse> responseObserver) {
         try {
-            DtoProtoConversions dtoProtoConversions = new DtoProtoConversions();
-            Book bookToUpdate = dtoProtoConversions.convertFromBookProto(request.getBook(), authorService);
+            ModelsToGrpcEntities modelsToGrpcEntities = new ModelsToGrpcEntities();
+            Book bookToUpdate = modelsToGrpcEntities.convertFromBookProto(request.getBook(), authorServiceImp);
             Book updatedBook = bookService.updateBook(bookToUpdate);
             BookOuterClass.Book responseBook = convertToBookOuterBookProto(updatedBook);
             BookOuterClass.UpdateBookResponse response = BookOuterClass.UpdateBookResponse.newBuilder().setBook(responseBook).build();
