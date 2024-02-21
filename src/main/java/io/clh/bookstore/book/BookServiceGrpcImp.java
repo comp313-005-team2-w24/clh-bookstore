@@ -49,6 +49,7 @@ public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
 
             Book.GetBookByIdResponse response = Book.GetBookByIdResponse.newBuilder().setBook(grpc).build();
             responseObserver.onNext(response);
+            responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
