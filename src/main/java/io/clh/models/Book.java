@@ -46,16 +46,4 @@ public class Book {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Book book)) return false;
-        return book_id != null && book_id.equals(book.book_id);
-    }
-
-    @Override
-    public int hashCode() {
-        return book_id == null ? 0 : book_id.hashCode();
-    }
 }

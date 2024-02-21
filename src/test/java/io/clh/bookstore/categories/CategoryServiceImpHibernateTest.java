@@ -29,7 +29,7 @@ import java.util.Set;
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CategoryServiceHibernateTest {
+public class CategoryServiceImpHibernateTest {
     private static SessionFactory sessionFactory;
     private static Session session;
 
@@ -80,7 +80,7 @@ public class CategoryServiceHibernateTest {
     @Test
     @Order(1)
     public void CreateCategory() {
-        CategoryService categoryService = new CategoryService(sessionFactory);
+        CategoryServiceImpService categoryServiceImp = new CategoryServiceImpService(sessionFactory);
 
         Set<Book> emptyBooks = Set.of();
 
@@ -91,7 +91,7 @@ public class CategoryServiceHibernateTest {
         category.setBooks(emptyBooks);
 
         Transaction tx = session.beginTransaction();
-        Category addedCategory = categoryService.AddCategory(category);
+        Category addedCategory = categoryServiceImp.AddCategory(category);
         tx.commit();
 
         Assertions.assertEquals(addedCategory.getId(), 1);
@@ -100,10 +100,10 @@ public class CategoryServiceHibernateTest {
     @Test
     @Order(2)
     public void GetAllCategories() {
-        CategoryService categoryService = new CategoryService(sessionFactory);
+        CategoryServiceImpService categoryServiceImp = new CategoryServiceImpService(sessionFactory);
 
         Transaction tx = session.beginTransaction();
-        List<Category> categories = categoryService.GetAllCategories();
+        List<Category> categories = categoryServiceImp.GetAllCategories();
         tx.commit();
 
         Optional<Long> allCategories = Optional.ofNullable(categories.get(0).getId());
@@ -115,7 +115,7 @@ public class CategoryServiceHibernateTest {
     @Test()
     @Order(3)
     public void UpdateCategory() {
-        CategoryService categoryService = new CategoryService(sessionFactory);
+        CategoryServiceImpService categoryServiceImp = new CategoryServiceImpService(sessionFactory);
         AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
         BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, authorServiceImp);
 
@@ -151,7 +151,7 @@ public class CategoryServiceHibernateTest {
         tx.commit();
 
 
-        Category updateCategory = categoryService.UpdateCategory(category);
+        Category updateCategory = categoryServiceImp.UpdateCategory(category);
         Set<Book> books = updateCategory.getBooks();
 
         List<Book> bookList = books.stream().toList();
@@ -163,8 +163,8 @@ public class CategoryServiceHibernateTest {
     @Test
     @Order(4)
     public void GetAllBooksByCategory() {
-        CategoryService categoryService = new CategoryService(sessionFactory);
-        List<Book> books = categoryService.GetAllBooksByCategory(1);
+        CategoryServiceImpService categoryServiceImp = new CategoryServiceImpService(sessionFactory);
+        List<Book> books = categoryServiceImp.GetAllBooksByCategory(1);
 
         Assertions.assertFalse(books.isEmpty(), "Books list should not be empty");
         Assertions.assertEquals(books.get(0).getTitle(), "Test Book");
@@ -173,9 +173,9 @@ public class CategoryServiceHibernateTest {
     @Test
     @Order(5)
     public void GetCategoryById() {
-        CategoryService categoryService = new CategoryService(sessionFactory);
+        CategoryServiceImpService categoryServiceImp = new CategoryServiceImpService(sessionFactory);
 
-        Category category = categoryService.GetCategoryById(1L);
+        Category category = categoryServiceImp.GetCategoryById(1L);
 
         Assertions.assertTrue(category.getId() > 0);
         Assertions.assertEquals(category.getName(), "Novel");
@@ -184,9 +184,9 @@ public class CategoryServiceHibernateTest {
     @Test
     @Order(6)
     public void DeleteCategoryById() {
-        CategoryService categoryService = new CategoryService(sessionFactory);
+        CategoryServiceImpService categoryServiceImp = new CategoryServiceImpService(sessionFactory);
 
-        Category category = categoryService.DeleteCategory(1);
+        Category category = categoryServiceImp.DeleteCategory(1);
 
         Assertions.assertTrue(category.getId() > 0);
         Assertions.assertEquals(category.getName(), "Novel");
