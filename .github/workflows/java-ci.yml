@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Java CI/CD with Gradle
 
 on:
   push:
@@ -32,12 +32,17 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Run tests
         run: ./gradlew test
-      - name: Run tests
+      - name: Build
         run: ./gradlew build
       - name: Login to DockerHub
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push Docker image with Jib
+      - name: Build and push Docker image with Jib on merge to master
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: ./gradlew jib --image=glad2os/clh-bookstore:latest
+      - name: Build Docker image with Jib on PR
+        if: github.event_name == 'pull_request'
+        run: ./gradlew jib
