@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package io.clh.bookstore.category;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+message Book {
+  int64 book_id = 1;
+  string title = 2;
+  string description = 3;
+  string isbn = 4;
+  google.protobuf.Timestamp publicationDate = 5;
+  double price = 6;
+  int32 stockQuantity = 7;
+  repeated int64 authorIds = 8;
+  string avatar_url = 9;
+}
+
+message Category {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  repeated Book books = 4;
+}
+
+service CategoryService {
+  rpc GetAllBooksByCategory (GetAllBooksByCategoryRequest) returns (GetAllBooksByCategoryResponse);
+  rpc AddCategory (Category) returns (Category);
+  rpc DeleteCategory (DeleteCategoryRequest) returns (Category);
+  rpc GetAllCategories (google.protobuf.Empty) returns (GetAllCategoriesResponse);
+  rpc UpdateCategory (Category) returns (Category);
+  rpc GetCategoryById (GetCategoryByIdRequest) returns (Category);
+}
+
+message GetAllBooksByCategoryRequest {
+  int32 category_id = 1;
+}
+
+message GetAllBooksByCategoryResponse {
+  repeated Book books = 1;
+}
+
+message DeleteCategoryRequest {
+  int32 category_id = 1;
+}
+
+message GetAllCategoriesResponse {
+  repeated Category categories = 1;
+}
+
+message GetCategoryByIdRequest {
+  int64 category_id = 1;
+}

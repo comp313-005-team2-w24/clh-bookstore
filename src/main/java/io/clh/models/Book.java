@@ -3,19 +3,21 @@ package io.clh.models;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.HashSet;
+import java.sql.Date;
 import java.util.Set;
 
 @Entity
-@RequiredArgsConstructor()
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 @Setter
+@NoArgsConstructor
 @Table(name = "books")
 @ToString(exclude = {"authors", "category"})
+@Builder
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //TODO: Long
     private Integer book_id;
 
     private String title;
@@ -23,7 +25,7 @@ public class Book {
     private String isbn;
 
     @Column(name = "publication_date")
-    private java.sql.Date publicationDate;
+    private Date publicationDate;
 
     private Double price;
 

@@ -4,6 +4,7 @@ import io.clh.models.Author;
 
 import java.util.List;
 
+// AuthorService
 public interface IAuthor {
     Author addAuthor(Author author);
 

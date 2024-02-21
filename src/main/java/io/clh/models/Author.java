@@ -7,9 +7,9 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@RequiredArgsConstructor()
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
+@NoArgsConstructor
 @Setter
 @Table(name = "authors")
 @ToString(exclude = "books") // it causes issues with lazy loading

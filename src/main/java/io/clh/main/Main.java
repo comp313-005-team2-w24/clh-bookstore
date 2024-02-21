@@ -4,11 +4,15 @@ import io.clh.bookstore.author.AuthorService;
 import io.clh.bookstore.author.AuthorServiceGrpcImp;
 import io.clh.bookstore.book.BookService;
 import io.clh.bookstore.book.BookServiceGrpcImp;
+import io.clh.bookstore.categories.CategoryService;
+import io.clh.bookstore.categories.CategoryServiceGrpcImp;
 import io.clh.config.HibernateConfigUtil;
+import io.clh.models.Category;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
+import org.hibernate.SessionFactory;
 
 import java.io.IOException;
 
@@ -20,18 +24,21 @@ public class Main {
         DefaultExports.initialize();
         HTTPServer logServer = new HTTPServer(8079);
 
-
         /*
          * Hibernate services used for implement CRUD operations Postgresql
          */
-        AuthorService authorService = new AuthorService(HibernateConfigUtil.createSessionFactory());
-        BookService bookService = new BookService(HibernateConfigUtil.createSessionFactory(), authorService);
+        SessionFactory sessionFactory = HibernateConfigUtil.createSessionFactory();
+
+        AuthorService authorService = new AuthorService(sessionFactory);
+        BookService bookService = new BookService(sessionFactory, authorService);
+        CategoryService categoryService = new CategoryService(sessionFactory );
 
         /*
          * gRPC server. use addService() to add new services (e.g. CRUD operations)
          */
         AuthorServiceGrpcImp authorServiceGrpcImp = new AuthorServiceGrpcImp(authorService, bookService);
         BookServiceGrpcImp bookServiceGrpcImp = new BookServiceGrpcImp(bookService, authorService);
+        CategoryServiceGrpcImp categoryServiceGrpcImp = new CategoryServiceGrpcImp(categoryService);
 
         Server server = ServerBuilder.forPort(GRPC_SERVER_PORT).addService(authorServiceGrpcImp).addService(bookServiceGrpcImp).build();
 

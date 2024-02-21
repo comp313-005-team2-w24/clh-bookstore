@@ -128,7 +128,6 @@ public class CategoryServiceHibernateTest {
         authorService.addAuthor(author);
         tx.commit();
 
-
         Book book = new Book();
         book.setTitle("Test Book");
         book.setDescription("A test book description");
