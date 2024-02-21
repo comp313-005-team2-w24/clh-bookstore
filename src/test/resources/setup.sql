@@ -9,10 +9,9 @@ create table authors
 
 create table categories
 (
-    id          bigint not null
-        primary key,
+    category_id serial primary key,
     description varchar(255),
-    name        varchar(255)
+    name varchar(255)
 );
 
 create table books

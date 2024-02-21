@@ -17,7 +17,6 @@ import java.util.Set;
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    //TODO: Long
     private Long book_id;
 
     private String title;
