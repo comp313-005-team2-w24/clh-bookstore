@@ -1,72 +1,67 @@
 package io.clh.bookstore.book;
 
-import io.clh.bookstore.BookOuterClass;
-import io.clh.bookstore.BookServiceGrpc;
-import io.clh.bookstore.author.AuthorService;
-import io.clh.bookstore.untils.DtoProtoConversions;
-import io.clh.models.Book;
+import io.clh.bookstore.author.AuthorServiceImp;
+import io.clh.bookstore.bookstore.Book;
+import io.clh.bookstore.bookstore.BookServiceGrpc;
+import io.clh.bookstore.entities.Entities;
+import io.clh.bookstore.untils.GrpcEntitiesToModels;
+import io.clh.bookstore.untils.ModelsToGrpcEntities;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static io.clh.bookstore.untils.DtoProtoConversions.convertToBookOuterBookProto;
+import static io.clh.bookstore.untils.ModelsToGrpcEntities.BookModelToGrpc;
 
+@RequiredArgsConstructor
 public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
 
-    private final BookService bookService;
-    private final AuthorService authorService;
-
-    public BookServiceGrpcImp(BookService bookService, AuthorService authorService) {
-        this.bookService = bookService;
-        this.authorService = authorService;
-    }
+    private final BookServiceImpService bookServiceImp;
+    private final AuthorServiceImp authorServiceImp;
 
     @Override
-    public void createBook(BookOuterClass.CreateBookRequest request, StreamObserver<BookOuterClass.CreateBookResponse> responseObserver) {
+    public void createBook(Book.CreateBookRequest request, StreamObserver<Book.CreateBookResponse> responseObserver) {
         try {
-            DtoProtoConversions dtoProtoConversions = new DtoProtoConversions();
-            Book book = dtoProtoConversions.convertFromBookProto(request.getBook(), authorService);
-
-            Book createdBook = bookService.createBook(book);
-            BookOuterClass.Book responseBook = convertToBookOuterBookProto(createdBook);
-            BookOuterClass.CreateBookResponse response = BookOuterClass.CreateBookResponse.newBuilder().setBook(responseBook).build();
+            GrpcEntitiesToModels converter = new GrpcEntitiesToModels();
+            io.clh.models.Book book = converter.convertFromBookProto(request.getBook(), authorServiceImp);
+            io.clh.models.Book createdBook = bookServiceImp.createBook(book);
+            Entities.Book grpcBook = BookModelToGrpc(createdBook);
+            Book.CreateBookResponse response = Book.CreateBookResponse.newBuilder().setBook(grpcBook).build();
 
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
 
-
     @Override
-    public void getBookById(BookOuterClass.GetBookByIdRequest request, StreamObserver<BookOuterClass.GetBookByIdResponse> responseObserver) {
+    public void getBookById(Book.GetBookByIdRequest request, StreamObserver<Book.GetBookByIdResponse> responseObserver) {
         try {
-            Book book = bookService.getBookById((int) request.getId());
-            if (book != null) {
-                BookOuterClass.Book responseBook = convertToBookOuterBookProto(book);
-                BookOuterClass.GetBookByIdResponse response = BookOuterClass.GetBookByIdResponse.newBuilder().setBook(responseBook).build();
-                responseObserver.onNext(response);
-            } else {
+            io.clh.models.Book bookById = bookServiceImp.getBookById(request.getId());
+            if (bookById == null) {
                 responseObserver.onError(new Throwable("Book not found with ID: " + request.getId()));
+                return;
             }
-            responseObserver.onCompleted();
+            Entities.Book grpc = BookModelToGrpc(bookById);
+
+            Book.GetBookByIdResponse response = Book.GetBookByIdResponse.newBuilder().setBook(grpc).build();
+            responseObserver.onNext(response);
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
 
+
     @Override
-    public void getAllBooks(BookOuterClass.GetAllBooksRequest request, StreamObserver<BookOuterClass.GetAllBooksResponse> responseObserver) {
+    public void getAllBooks(Book.GetAllBooksRequest request, StreamObserver<Entities.Book> responseObserver) {
         try {
             int limitPages = request.getPage() == 0 ? 1 : request.getPage();
+            List<io.clh.models.Book> books = bookServiceImp.getAllBooks(limitPages);
+            books.stream().map(ModelsToGrpcEntities::BookModelToGrpc).forEach(responseObserver::onNext);
 
-            List<Book> books = bookService.getAllBooks(limitPages);
-            List<BookOuterClass.Book> responseBooks = books.stream().map(DtoProtoConversions::convertToBookOuterBookProto).collect(Collectors.toList());
-            BookOuterClass.GetAllBooksResponse response = BookOuterClass.GetAllBooksResponse.newBuilder().addAllBooks(responseBooks).build();
-            responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
@@ -74,19 +69,39 @@ public class BookServiceGrpcImp extends BookServiceGrpc.BookServiceImplBase {
     }
 
     @Override
-    public void updateBook(BookOuterClass.UpdateBookRequest request, StreamObserver<BookOuterClass.UpdateBookResponse> responseObserver) {
+    public void updateBook(Book.UpdateBookRequest request, StreamObserver<Book.UpdateBookResponse> responseObserver) {
         try {
-            DtoProtoConversions dtoProtoConversions = new DtoProtoConversions();
-            Book bookToUpdate = dtoProtoConversions.convertFromBookProto(request.getBook(), authorService);
-            Book updatedBook = bookService.updateBook(bookToUpdate);
-            BookOuterClass.Book responseBook = convertToBookOuterBookProto(updatedBook);
-            BookOuterClass.UpdateBookResponse response = BookOuterClass.UpdateBookResponse.newBuilder().setBook(responseBook).build();
+            GrpcEntitiesToModels converter = new GrpcEntitiesToModels();
+            io.clh.models.Book book = converter.convertFromBookProto(request.getBook(), authorServiceImp);
 
-            responseObserver.onNext(response);
+            io.clh.models.Book updatedBook = bookServiceImp.updateBook(book);
+
+            Entities.Book grpcBook = BookModelToGrpc(updatedBook);
+            Book.UpdateBookResponse updateBookResponse = Book.UpdateBookResponse.newBuilder().setBook(grpcBook).build();
+
+            responseObserver.onNext(updateBookResponse);
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
         }
     }
 
+    @Override
+    public void deleteBook(Book.DeleteBookRequest request, StreamObserver<Book.DeleteBookResponse> responseObserver) {
+        try {
+            io.clh.models.Book deletedBookById = bookServiceImp.deleteBookById(request.getBook().getBookId());
+            if (deletedBookById == null) {
+                responseObserver.onError(new Throwable("Book not able to delete with ID: " + request.getBook().getBookId()));
+                return;
+            }
+
+            Entities.Book grpcBook = BookModelToGrpc(deletedBookById);
+            Book.DeleteBookResponse deleteBookResponse = Book.DeleteBookResponse.newBuilder().setBook(grpcBook).build();
+
+            responseObserver.onNext(deleteBookResponse);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            responseObserver.onError(Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException());
+        }
+    }
 }

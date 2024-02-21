@@ -3,25 +3,29 @@ package io.clh.models;
 import lombok.*;
 
 import javax.persistence.*;
+import java.sql.Date;
 import java.util.Set;
 
 @Entity
-@RequiredArgsConstructor()
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "books")
-@ToString
+@ToString(exclude = {"authors", "category"})
+@Builder
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer book_id;
+    //TODO: Long
+    private Long book_id;
 
     private String title;
     private String description;
     private String isbn;
 
     @Column(name = "publication_date")
-    private java.sql.Date publicationDate;
+    private Date publicationDate;
 
     private Double price;
 
@@ -39,15 +43,7 @@ public class Book {
     )
     private Set<Author> authors;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Book book)) return false;
-        return book_id != null && book_id.equals(book.book_id);
-    }
-
-    @Override
-    public int hashCode() {
-        return book_id == null ? 0 : book_id.hashCode();
-    }
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private Category category;
 }

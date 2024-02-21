@@ -1,23 +1,23 @@
 package io.clh.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@RequiredArgsConstructor()
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
-@Data
+@Getter
+@NoArgsConstructor
+@Setter
 @Table(name = "authors")
+@ToString(exclude = "books") // it causes issues with lazy loading
+@Builder
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int author_id;
+    private Long author_id;
 
     private char[] name;
     private String biography;

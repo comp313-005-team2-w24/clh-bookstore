@@ -1,9 +1,10 @@
 package io.clh.bookstore.books;
 
-import io.clh.bookstore.author.AuthorService;
-import io.clh.bookstore.book.BookService;
+import io.clh.bookstore.author.AuthorServiceImp;
+import io.clh.bookstore.book.BookServiceImpService;
 import io.clh.models.Author;
 import io.clh.models.Book;
+import io.clh.models.Category;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -13,14 +14,20 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.util.Set;
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class BookServiceHibernateTest {
+public class BookServiceImpHibernateTest {
     private static SessionFactory sessionFactory;
     private static Session session;
 
@@ -29,7 +36,7 @@ public class BookServiceHibernateTest {
             new PostgreSQLContainer<>("postgres:latest").withDatabaseName("testdb").withUsername("test").withPassword("test");
 
     @BeforeAll
-    public static void setUp() {
+    public static void setUp() throws IOException, URISyntaxException {
         postgresqlContainer.start();
 
         Configuration configuration = new Configuration();
@@ -39,41 +46,18 @@ public class BookServiceHibernateTest {
         configuration.setImplicitNamingStrategy(new org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl());
         configuration.addAnnotatedClass(Author.class);
         configuration.addAnnotatedClass(Book.class);
+        configuration.addAnnotatedClass(Category.class);
 
         sessionFactory = configuration.buildSessionFactory();
         session = sessionFactory.openSession();
 
-        try (Connection conn = DriverManager.getConnection(
-                postgresqlContainer.getJdbcUrl(),
-                postgresqlContainer.getUsername(),
-                postgresqlContainer.getPassword()
-        ); Statement stmt = conn.createStatement()) {
-            stmt.execute("CREATE TABLE authors (" +
-                    "    author_id SERIAL PRIMARY KEY," +
-                    "    name VARCHAR(100)," +
-                    "    avatar_url VARCHAR(255)," +
-                    "    biography TEXT" +
-                    ");");
-
-            stmt.execute("CREATE TABLE books (" +
-                    "    book_id SERIAL PRIMARY KEY," +
-                    "    title VARCHAR(255)," +
-                    "    description TEXT," +
-                    "    isbn VARCHAR(20)," +
-                    "    publication_date DATE," +
-                    "    price DECIMAL(10, 2)," +
-                    "    stock_quantity INT," +
-                    "    avatar_url VARCHAR(255)," +
-                    "    category_id INT" +
-                    ");");
-
-            stmt.execute("CREATE TABLE book_authors (" +
-                    "    book_id INT NOT NULL," +
-                    "    author_id INT NOT NULL," +
-                    "    PRIMARY KEY (book_id, author_id)," +
-                    "    FOREIGN KEY (book_id) REFERENCES books(book_id) ON DELETE CASCADE," +
-                    "    FOREIGN KEY (author_id) REFERENCES authors(author_id) ON DELETE CASCADE" +
-                    ");");
+        Path path = Paths.get(ClassLoader.getSystemResource("setup.sql").toURI());
+        String sql = new String(Files.readAllBytes(path));
+        try (Connection conn = DriverManager.getConnection(postgresqlContainer.getJdbcUrl(), postgresqlContainer.getUsername(), postgresqlContainer.getPassword()); Statement stmt = conn.createStatement()) {
+            String[] statements = sql.split(";");
+            for (String statement : statements) {
+                stmt.execute(statement.trim());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to initialize database schema", e);
@@ -96,8 +80,8 @@ public class BookServiceHibernateTest {
     @Test
     @Order(1)
     public void createBook() {
-        AuthorService authorService = new AuthorService(sessionFactory);
-        BookService bookService = new BookService(sessionFactory, authorService);
+        AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
+        BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, authorServiceImp);
 
         Author author = new Author();
         author.setName("Author Name".toCharArray());
@@ -105,7 +89,7 @@ public class BookServiceHibernateTest {
         author.setAvatar_url("http://example.com/avatar.jpg");
 
         Transaction tx = session.beginTransaction();
-        authorService.addAuthor(author);
+        authorServiceImp.addAuthor(author);
         tx.commit();
 
         Book book = new Book();
@@ -116,27 +100,27 @@ public class BookServiceHibernateTest {
         book.setStockQuantity(100);
         book.setAvatar_url("http://example.com/image.png");
         book.setPublicationDate(new Date(System.currentTimeMillis()));
+        book.setAuthors(Set.of(author));
 
         tx = session.beginTransaction();
-        bookService.createBook(book);
+        bookServiceImp.createBook(book);
         tx.commit();
 
-        Book retrievedBook = bookService.getBookById(1);
+        Book retrievedBook = bookServiceImp.getBookById(1L);
 
-
-        Assertions.assertTrue(book.getBook_id() > 0);
-        Assertions.assertTrue(author.getAuthor_id() > 0);
+        Assertions.assertTrue(retrievedBook.getBook_id() > 0);
+        Assertions.assertFalse(retrievedBook.getAuthors().isEmpty());
     }
 
 
     @Test
     @Order(2)
     public void GetBookByIdNotEmpty() {
-        AuthorService authorService = new AuthorService(sessionFactory);
-        BookService bookService = new BookService(sessionFactory, authorService);
+        AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
+        BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, authorServiceImp);
 
         Transaction tx = session.beginTransaction();
-        Book retrievedBook = bookService.getBookById(1);
+        Book retrievedBook = bookServiceImp.getBookById(1L);
         tx.commit();
 
         Assertions.assertTrue(retrievedBook.getBook_id() > 0);
@@ -145,16 +129,39 @@ public class BookServiceHibernateTest {
     @Test
     @Order(3)
     public void updateBook() {
-        BookService bookService = new BookService(sessionFactory, new AuthorService(sessionFactory));
+        BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, new AuthorServiceImp(sessionFactory));
 
         Transaction tx = session.beginTransaction();
-        Book bookToUpdate = bookService.getBookById(1);
+        Book bookToUpdate = bookServiceImp.getBookById(1L);
         bookToUpdate.setTitle("Updated Test Book Title");
-        bookService.updateBook(bookToUpdate);
+        bookServiceImp.updateBook(bookToUpdate);
         tx.commit();
 
-        Book updatedBook = bookService.getBookById(1);
+        Book updatedBook = bookServiceImp.getBookById(1L);
 
         Assertions.assertEquals("Updated Test Book Title", updatedBook.getTitle());
+    }
+
+    @Test
+    @Order(4)
+    public void deleteBook() {
+        BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, new AuthorServiceImp(sessionFactory));
+        Transaction tx = session.beginTransaction();
+        Book bookToDelete = bookServiceImp.deleteBookById(1L);
+        tx.commit();
+
+        Assertions.assertTrue(bookToDelete.getBook_id() > 0);
+    }
+
+    @Test
+    @Order(5)
+    public void BookHasBeenRemoved() {
+        BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, new AuthorServiceImp(sessionFactory));
+
+        Transaction tx = session.beginTransaction();
+        Book removedBook = bookServiceImp.getBookById(1L);
+        tx.commit();
+
+        Assertions.assertNull(removedBook);
     }
 }
