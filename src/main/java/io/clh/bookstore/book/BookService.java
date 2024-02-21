@@ -61,7 +61,7 @@ public class BookService implements IBook {
 
 
     @Override
-    public Set<Book> findBooksByAuthorId(int authorId) {
+    public Set<Book> findBooksByAuthorId(Long authorId) {
         try (Session session = sessionFactory.openSession()) {
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Book> cq = cb.createQuery(Book.class);
@@ -74,7 +74,7 @@ public class BookService implements IBook {
     }
 
     @Override
-    public Book deleteBookById(int bookId) {
+    public Book deleteBookById(Long bookId) {
         Transaction transaction = null;
         Book bookById = getBookById(bookId);
 
@@ -111,7 +111,7 @@ public class BookService implements IBook {
     }
 
     @Override
-    public Book getBookById(int bookId) {
+    public Book getBookById(Long bookId) {
         try (Session session = sessionFactory.openSession()) {
             String jpql = "SELECT b FROM Book b LEFT JOIN FETCH b.authors WHERE b.id = :bookId";
             return session.createQuery(jpql, Book.class)
