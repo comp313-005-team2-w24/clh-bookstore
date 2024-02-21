@@ -8,9 +8,9 @@ import java.util.List;
 public interface AuthorService {
     Author addAuthor(Author author);
 
-    Author getAuthorById(Integer id);
+    Author getAuthorById(Long id);
 
     List<Author> getAllAuthors(int page);
 
-    Author setUrlAvatar(String url, Integer id) throws IllegalAccessException;
+    Author setUrlAvatar(String url, Long id) throws IllegalAccessException;
 }

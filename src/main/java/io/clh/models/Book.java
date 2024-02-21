@@ -18,7 +18,7 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     //TODO: Long
-    private Integer book_id;
+    private Long book_id;
 
     private String title;
     private String description;

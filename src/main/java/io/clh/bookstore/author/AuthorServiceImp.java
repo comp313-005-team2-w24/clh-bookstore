@@ -29,7 +29,7 @@ public class AuthorServiceImp implements AuthorService {
     }
 
     @Override
-    public Author getAuthorById(Integer id) {
+    public Author getAuthorById(Long id) {
         Session session = sessionFactory.openSession();
         Author author = session.get(Author.class, id);
         session.close();
@@ -54,7 +54,7 @@ public class AuthorServiceImp implements AuthorService {
 
 
     @Override
-    public Author setUrlAvatar(String url, Integer id) {
+    public Author setUrlAvatar(String url, Long id) {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
