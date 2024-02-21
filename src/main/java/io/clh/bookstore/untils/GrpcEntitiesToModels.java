@@ -2,6 +2,7 @@ package io.clh.bookstore.untils;
 
 import com.google.protobuf.Timestamp;
 import io.clh.bookstore.author.AuthorService;
+import io.clh.bookstore.book.BookService;
 import io.clh.bookstore.entities.Entities;
 import io.clh.models.Author;
 import io.clh.models.Book;
@@ -51,15 +52,20 @@ public class GrpcEntitiesToModels {
                 .build();
     }
 
-    public Category CategoryGrpcToCategoryModel(Entities.Category category, AuthorService authorService) {
+    public Category CategoryGrpcToCategoryModel(Entities.Category category, AuthorService authorService, BookService bookService) {
         GrpcEntitiesToModels converter = new GrpcEntitiesToModels();
-        List<Book> list = category.getBooksList().stream().map(book -> converter.convertFromBookProto(book, authorService)).toList();
+        List<Book> list = category.getBooksList().stream()
+                .map(book -> converter.convertFromBookProto(book, authorService))
+                .map(book -> bookService.getBookById(book.getBook_id()))
+                .toList();
+
+        Set<Book> booksSet = new HashSet<>(list);
 
         return Category.builder()
-                .id(category.getId())
+                .category_id(category.getId())
                 .name(category.getName())
                 .description(category.getDescription())
-                .books(Set.of((Book) list))
+                .books(booksSet)
                 .build();
     }
 }

@@ -45,7 +45,7 @@ public class ModelsToGrpcEntities {
     public static Entities.Category CategoryModelToCategoryGrpc(Category category) {
         Entities.Category.Builder builder = Entities.Category.newBuilder();
 
-        builder.setId(category.getId());
+        builder.setId(category.getCategory_id());
         builder.setName(category.getName());
         builder.setDescription(category.getDescription());
         List<Entities.Book> list = category.getBooks().stream().map(ModelsToGrpcEntities::BookModelToGrpc).toList();

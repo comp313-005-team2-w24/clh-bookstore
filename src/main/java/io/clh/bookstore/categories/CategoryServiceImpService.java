@@ -27,7 +27,7 @@ public class CategoryServiceImpService implements CategoryService {
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Book> cq = cb.createQuery(Book.class);
             Root<Book> root = cq.from(Book.class);
-            cq.where(cb.equal(root.get("category").get("id"), categoryId));
+            cq.where(cb.equal(root.get("category").get("category_id"), categoryId));
 
             TypedQuery<Book> query = session.createQuery(cq);
             return query.getResultList();
@@ -42,6 +42,14 @@ public class CategoryServiceImpService implements CategoryService {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
+
+            if (!category.getBooks().isEmpty()) {
+                category.getBooks().forEach(book -> {
+                    book.setCategory(category);
+                    session.saveOrUpdate(book);
+                });
+            }
+
             session.save(category);
             transaction.commit();
 
@@ -109,7 +117,7 @@ public class CategoryServiceImpService implements CategoryService {
     @Override
     public Category GetCategoryById(Long categoryId) {
         try (Session session = sessionFactory.openSession()) {
-            String jpql = "SELECT c FROM Category c LEFT JOIN FETCH c.books WHERE c.id = :categoryId";
+            String jpql = "SELECT c FROM Category c LEFT JOIN FETCH c.books WHERE c.category_id = :categoryId";
             return session.createQuery(jpql, Category.class)
                     .setParameter("categoryId", categoryId)
                     .getSingleResult();

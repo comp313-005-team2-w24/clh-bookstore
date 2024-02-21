@@ -85,7 +85,6 @@ public class CategoryServiceImpHibernateTest {
         Set<Book> emptyBooks = Set.of();
 
         Category category = new Category();
-        category.setId(1L);
         category.setName("Novel");
         category.setDescription("Test");
         category.setBooks(emptyBooks);
@@ -94,7 +93,7 @@ public class CategoryServiceImpHibernateTest {
         Category addedCategory = categoryServiceImp.AddCategory(category);
         tx.commit();
 
-        Assertions.assertEquals(addedCategory.getId(), 1);
+        Assertions.assertEquals(addedCategory.getCategory_id(), 1);
     }
 
     @Test
@@ -106,7 +105,7 @@ public class CategoryServiceImpHibernateTest {
         List<Category> categories = categoryServiceImp.GetAllCategories();
         tx.commit();
 
-        Optional<Long> allCategories = Optional.ofNullable(categories.get(0).getId());
+        Optional<Long> allCategories = Optional.ofNullable(categories.get(0).getCategory_id());
 
         Assertions.assertFalse(categories.isEmpty());
         Assertions.assertEquals(allCategories.get(), 1);
@@ -139,7 +138,7 @@ public class CategoryServiceImpHibernateTest {
         book.setAuthors(Set.of(author));
 
         Category category = new Category();
-        category.setId(1L);
+        category.setCategory_id(1L);
         category.setName("Novel");
         category.setDescription("Test");
         category.setBooks(Set.of(book));
@@ -177,7 +176,7 @@ public class CategoryServiceImpHibernateTest {
 
         Category category = categoryServiceImp.GetCategoryById(1L);
 
-        Assertions.assertTrue(category.getId() > 0);
+        Assertions.assertTrue(category.getCategory_id() > 0);
         Assertions.assertEquals(category.getName(), "Novel");
     }
 
@@ -188,7 +187,7 @@ public class CategoryServiceImpHibernateTest {
 
         Category category = categoryServiceImp.DeleteCategory(1);
 
-        Assertions.assertTrue(category.getId() > 0);
+        Assertions.assertTrue(category.getCategory_id() > 0);
         Assertions.assertEquals(category.getName(), "Novel");
     }
 }
