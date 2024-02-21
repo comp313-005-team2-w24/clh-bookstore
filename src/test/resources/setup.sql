@@ -40,16 +40,3 @@ create table book_authors
             references authors,
     primary key (book_id, author_id)
 );
-
-create table categories_books
-(
-    category_id   bigint  not null
-        constraint fk3i5qlw63appsdgy6qtp0pqk83
-            references categories,
-    books_book_id integer not null
-        constraint uk_rtsclxyko9ppqks6acta4i84t
-            unique
-        constraint fkbdd1ei67142eh1gh84dhhvw17
-            references books,
-    primary key (category_id, books_book_id)
-);
