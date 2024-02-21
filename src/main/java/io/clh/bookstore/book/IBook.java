@@ -7,11 +7,14 @@ import java.util.Set;
 
 public interface IBook {
     Book createBook(Book book);
+
     List<Book> getAllBooks(int page);
+
     Book updateBook(Book book);
 
-    Book getBookById(int bookId);
-    Set<Book> findBooksByAuthorId(int authorId);
+    Book getBookById(Long bookId);
 
-    Book deleteBookById(int bookId);
+    Set<Book> findBooksByAuthorId(Long authorId);
+
+    Book deleteBookById(Long bookId);
 }

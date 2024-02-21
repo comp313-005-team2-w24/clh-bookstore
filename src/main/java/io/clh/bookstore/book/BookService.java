@@ -3,6 +3,7 @@ package io.clh.bookstore.book;
 import io.clh.bookstore.author.AuthorServiceImp;
 import io.clh.models.Author;
 import io.clh.models.Book;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -14,15 +15,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@RequiredArgsConstructor
 public class BookService implements IBook {
     private final SessionFactory sessionFactory;
     private final AuthorServiceImp authorServiceImp;
-
-    public BookService(SessionFactory sessionFactory, AuthorServiceImp authorServiceImp) {
-        this.sessionFactory = sessionFactory;
-
-        this.authorServiceImp = authorServiceImp;
-    }
 
     @Override
     public Book createBook(Book book) {
