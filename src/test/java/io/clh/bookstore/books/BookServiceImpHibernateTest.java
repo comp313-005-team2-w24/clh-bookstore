@@ -1,7 +1,7 @@
 package io.clh.bookstore.books;
 
 import io.clh.bookstore.author.AuthorServiceImp;
-import io.clh.bookstore.book.BookService;
+import io.clh.bookstore.book.BookServiceImpService;
 import io.clh.models.Author;
 import io.clh.models.Book;
 import io.clh.models.Category;
@@ -27,7 +27,7 @@ import java.util.Set;
 
 @Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class BookServiceHibernateTest {
+public class BookServiceImpHibernateTest {
     private static SessionFactory sessionFactory;
     private static Session session;
 
@@ -81,7 +81,7 @@ public class BookServiceHibernateTest {
     @Order(1)
     public void createBook() {
         AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
-        BookService bookService = new BookService(sessionFactory, authorServiceImp);
+        BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, authorServiceImp);
 
         Author author = new Author();
         author.setName("Author Name".toCharArray());
@@ -103,10 +103,10 @@ public class BookServiceHibernateTest {
         book.setAuthors(Set.of(author));
 
         tx = session.beginTransaction();
-        bookService.createBook(book);
+        bookServiceImp.createBook(book);
         tx.commit();
 
-        Book retrievedBook = bookService.getBookById(1);
+        Book retrievedBook = bookServiceImp.getBookById(1L);
 
         Assertions.assertTrue(retrievedBook.getBook_id() > 0);
         Assertions.assertFalse(retrievedBook.getAuthors().isEmpty());
@@ -117,10 +117,10 @@ public class BookServiceHibernateTest {
     @Order(2)
     public void GetBookByIdNotEmpty() {
         AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
-        BookService bookService = new BookService(sessionFactory, authorServiceImp);
+        BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, authorServiceImp);
 
         Transaction tx = session.beginTransaction();
-        Book retrievedBook = bookService.getBookById(1);
+        Book retrievedBook = bookServiceImp.getBookById(1L);
         tx.commit();
 
         Assertions.assertTrue(retrievedBook.getBook_id() > 0);
@@ -129,15 +129,15 @@ public class BookServiceHibernateTest {
     @Test
     @Order(3)
     public void updateBook() {
-        BookService bookService = new BookService(sessionFactory, new AuthorServiceImp(sessionFactory));
+        BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, new AuthorServiceImp(sessionFactory));
 
         Transaction tx = session.beginTransaction();
-        Book bookToUpdate = bookService.getBookById(1);
+        Book bookToUpdate = bookServiceImp.getBookById(1L);
         bookToUpdate.setTitle("Updated Test Book Title");
-        bookService.updateBook(bookToUpdate);
+        bookServiceImp.updateBook(bookToUpdate);
         tx.commit();
 
-        Book updatedBook = bookService.getBookById(1);
+        Book updatedBook = bookServiceImp.getBookById(1L);
 
         Assertions.assertEquals("Updated Test Book Title", updatedBook.getTitle());
     }
@@ -145,9 +145,9 @@ public class BookServiceHibernateTest {
     @Test
     @Order(4)
     public void deleteBook() {
-        BookService bookService = new BookService(sessionFactory, new AuthorServiceImp(sessionFactory));
+        BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, new AuthorServiceImp(sessionFactory));
         Transaction tx = session.beginTransaction();
-        Book bookToDelete = bookService.deleteBookById(1);
+        Book bookToDelete = bookServiceImp.deleteBookById(1L);
         tx.commit();
 
         Assertions.assertTrue(bookToDelete.getBook_id() > 0);
@@ -156,10 +156,10 @@ public class BookServiceHibernateTest {
     @Test
     @Order(5)
     public void BookHasBeenRemoved() {
-        BookService bookService = new BookService(sessionFactory, new AuthorServiceImp(sessionFactory));
+        BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, new AuthorServiceImp(sessionFactory));
 
         Transaction tx = session.beginTransaction();
-        Book removedBook = bookService.getBookById(1);
+        Book removedBook = bookServiceImp.getBookById(1L);
         tx.commit();
 
         Assertions.assertNull(removedBook);

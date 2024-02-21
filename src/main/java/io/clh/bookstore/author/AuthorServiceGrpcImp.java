@@ -1,6 +1,6 @@
 package io.clh.bookstore.author;
 
-import io.clh.bookstore.book.BookService;
+import io.clh.bookstore.book.BookServiceImpService;
 import io.clh.bookstore.entities.Entities;
 import io.clh.bookstore.untils.ModelsToGrpcEntities;
 import io.clh.models.Book;
@@ -16,7 +16,7 @@ import static io.clh.bookstore.untils.ModelsToGrpcEntities.AuthorEntityModelToAu
 @RequiredArgsConstructor
 public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBase {
     private final AuthorServiceImp authorServiceImp;
-    private final BookService bookService;
+    private final BookServiceImpService bookServiceImp;
 
     @Override
     public void createAuthor(Author.CreateAuthorRequest request, StreamObserver<Entities.AuthorEntity> responseObserver) {
@@ -54,7 +54,7 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
             long authorId = request.getAuthorId();
 
             io.clh.models.Author authorById = authorServiceImp.getAuthorById(authorId);
-            List<Book> booksByAuthorId = bookService.findBooksByAuthorId(authorById.getAuthor_id()).stream().toList();
+            List<Book> booksByAuthorId = bookServiceImp.findBooksByAuthorId(authorById.getAuthor_id()).stream().toList();
 
             Entities.AuthorEntity authorEntity = AuthorEntityModelToAuthorGrpc(authorById);
             List<Entities.Book> collect = booksByAuthorId.stream().map(ModelsToGrpcEntities::BookModelToGrpc).toList();
