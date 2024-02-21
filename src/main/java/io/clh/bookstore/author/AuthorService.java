@@ -1,19 +1,18 @@
 package io.clh.bookstore.author;
 
 import io.clh.models.Author;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
+//AuthorServiceImp
+// TODO: Impl Lombok
+@RequiredArgsConstructor
 public class AuthorService implements IAuthor {
-
     private final SessionFactory sessionFactory;
-
-    public AuthorService(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
 
     @Override
     public Author addAuthor(Author author) {
