@@ -11,6 +11,7 @@ import io.clh.models.Category;
 import java.sql.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class GrpcEntitiesToModels {
@@ -55,11 +56,13 @@ public class GrpcEntitiesToModels {
     public Category CategoryGrpcToCategoryModel(Entities.Category category, AuthorService authorService, BookService bookService) {
         GrpcEntitiesToModels converter = new GrpcEntitiesToModels();
         List<Book> list = category.getBooksList().stream()
-                .map(book -> converter.convertFromBookProto(book, authorService))
-                .map(book -> bookService.getBookById(book.getBook_id()))
+                .map(book -> converter.convertFromBookProto(book, authorService)) // Convert from proto to Book
+                .map(book -> bookService.getBookById(book.getBook_id())) // Fetch the book from the service
+                .filter(Objects::nonNull)
                 .toList();
 
         Set<Book> booksSet = new HashSet<>(list);
+
 
         return Category.builder()
                 .category_id(category.getId())
