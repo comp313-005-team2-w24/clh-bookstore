@@ -21,7 +21,8 @@ public class AuthorServiceGrpcImp extends AuthorServiceGrpc.AuthorServiceImplBas
     @Override
     public void createAuthor(Author.CreateAuthorRequest request, StreamObserver<Entities.AuthorEntity> responseObserver) {
         try {
-            io.clh.models.Author author = authorServiceImp.addAuthor(AuthorGrpcToAuthorModel(request.getAuthor()));
+            io.clh.models.Author author1 = AuthorGrpcToAuthorModel(request.getAuthor());
+            io.clh.models.Author author = authorServiceImp.addAuthor(author1);
             Entities.AuthorEntity response = AuthorEntityModelToAuthorGrpc(author);
 
             responseObserver.onNext(response);

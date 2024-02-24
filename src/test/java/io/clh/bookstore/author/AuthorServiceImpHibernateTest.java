@@ -85,7 +85,7 @@ public class AuthorServiceImpHibernateTest {
         Set<Book> emptySet = Set.of();
 
 
-        Author author = new Author(1L, "username".toCharArray(), "my biblio", "",
+        Author author = new Author(1L, "username", "my biblio", "",
                 emptySet
         );
 
@@ -106,7 +106,7 @@ public class AuthorServiceImpHibernateTest {
         AuthorServiceImp authorServiceImp = new AuthorServiceImp(sessionFactory);
         Author authorById1 = authorServiceImp.getAuthorById(1L);
 
-        Assertions.assertTrue(authorById1.getName().length > 0);
+        Assertions.assertTrue(!authorById1.getName().isEmpty());
     }
 
 

@@ -59,7 +59,7 @@ public class ModelsToGrpcEntities {
         Entities.AuthorEntity.Builder builder = Entities.AuthorEntity.newBuilder();
 
         builder.setAuthorId(author.getAuthor_id());
-        builder.setName(builder.getName());
+        builder.setName(author.getName());
         builder.setBiography(author.getBiography());
         builder.setAvatarUrl(author.getAvatar_url());
 
