@@ -84,7 +84,7 @@ public class BookServiceImpHibernateTest {
         BookServiceImpService bookServiceImp = new BookServiceImpService(sessionFactory, authorServiceImp);
 
         Author author = new Author();
-        author.setName("Author Name".toCharArray());
+        author.setName("Author Name");
         author.setBiography("A brief bio");
         author.setAvatar_url("http://example.com/avatar.jpg");
 
