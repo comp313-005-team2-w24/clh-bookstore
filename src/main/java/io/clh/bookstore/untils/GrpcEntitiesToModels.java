@@ -19,7 +19,7 @@ public class GrpcEntitiesToModels {
         return Author.builder()
                 .avatar_url(authorEntity.getAvatarUrl())
                 .biography(authorEntity.getBiography())
-                .name(authorEntity.getName().toCharArray())
+                .name(authorEntity.getName())
                 .build();
     }
 
